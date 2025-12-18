@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+
+{% block extra_css %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="bi bi-send"></i> Envoyer le Ticket</h4>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <h5><i class="bi bi-ticket-perforated"></i> {{ ticket.ticket_number }}</h5>
+                    <p class="mb-1"><strong>Équipement:</strong> {{ ticket.equipment }}</p>
+                    <p class="mb-1"><strong>ASC:</strong> {{ ticket.asc.get_full_name }}</p>
+                    <p class="mb-1"><strong>Étape actuelle:</strong> <span class="badge bg-secondary">{{ ticket.get_current_stage_display }}</span></p>
+                    <p class="mb-1"><strong>Temps à cette étape:</strong>
+                        <span class="badge bg-{{ ticket.get_stage_status_color }} fs-6">{{ ticket.get_time_at_current_stage }} jour(s)</span>
+                    </p>
+                    <p class="mb-0"><strong>Statut:</strong> <span class="badge bg-{{ ticket.get_delay_color }}">{{ ticket.get_status_display }}</span></p>
+                </div>
+
+                {% if stage_choices %}
+                <form method="post" id="sendForm">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="to_role" class="form-label">Envoyer à (Département) <span class="text-danger">*</span></label>
+                        <select name="to_role" id="to_role" class="form-control form-select" required>
+                            <option value="">-- Sélectionner la destination --</option>
+                            {% for val, label in stage_choices %}
+                            <option value="{{ val }}">{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                        <small class="text-muted">Sélectionnez l'étape suivante dans le workflow</small>
+                    </div>
+
+                    <div class="mb-3" id="recipient-field" style="display: none;">
+                        <label for="recipient" class="form-label">Destinataire (Personne) <span class="text-danger">*</span></label>
+                        <select name="recipient" id="recipient" class="form-control" required>
+                            <option value="">-- Sélectionner d'abord le département --</option>
+                        </select>
+                        <small class="text-muted">Sélectionnez la personne du département qui recevra l'équipement</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="comment" class="form-label">Commentaire</label>
+                        <textarea name="comment" id="comment" class="form-control" rows="4" placeholder="Ajoutez un commentaire (optionnel)..."></textarea>
+                        <small class="text-muted">Ajoutez des notes ou observations sur l'envoi</small>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'tickets:detail' ticket.pk %}" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Annuler
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-send"></i> Envoyer
+                        </button>
+                    </div>
+                </form>
+                {% else %}
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle"></i> Aucune transition disponible depuis l'étape actuelle.
+                </div>
+                <a href="{% url 'tickets:detail' ticket.pk %}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Retour
+                </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Workflow Guide -->
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="bi bi-diagram-3"></i> Parcours du Ticket</h6>
+            </div>
+            <div class="card-body">
+                <ol class="mb-0">
+                    <li>Superviseur → Programme</li>
+                    <li>Programme → Logistique</li>
+                    <li>Logistique → Réparateur / E-Santé</li>
+                    <li>Réparateur / E-Santé → Retour - Logistique</li>
+                    <li>Retour - Logistique → Retour - Programme</li>
+                    <li>Retour - Programme → Retour - Superviseur</li>
+                    <li>Retour - Superviseur → Retourné à l'ASC (Clôture)</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+$(document).ready(function() {
+    const roleToStageMapping = {
+        'SUPERVISOR': 'SUPERVISOR',
+        'PROGRAM': 'PROGRAM',
+        'LOGISTICS': 'LOGISTICS',
+        'REPAIRER': 'REPAIRER',
+        'ESANTE': 'ESANTE',
+        'RETURNING_LOGISTICS': 'LOGISTICS',
+        'RETURNING_PROGRAM': 'PROGRAM',
+        'RETURNING_SUPERVISOR': 'SUPERVISOR',
+    };
+
+    // Initialiser Select2 pour le destinataire
+    $('#recipient').select2({
+        theme: 'bootstrap-5',
+        placeholder: '-- Sélectionner un destinataire --',
+        allowClear: true
+    });
+
+    // Quand l'étape de destination change
+    $('#to_role').on('change', function() {
+        const stage = $(this).val();
+        const recipientField = $('#recipient-field');
+        const recipientSelect = $('#recipient');
+
+        if (stage && stage !== 'RETURNED_ASC') {
+            // Afficher le champ destinataire
+            recipientField.show();
+            recipientSelect.prop('required', true);
+
+            // Déterminer le rôle correspondant
+            const role = roleToStageMapping[stage];
+
+            if (role) {
+                // Charger les utilisateurs de ce rôle
+                recipientSelect.empty().append('<option value="">-- Chargement... --</option>');
+
+                $.ajax({
+                    url: '/api/users/',
+                    data: { role: role },
+                    dataType: 'json',
+                    success: function(data) {
+                        recipientSelect.empty().append('<option value="">-- Sélectionner un destinataire --</option>');
+
+                        if (data.length === 0) {
+                            recipientSelect.append('<option value="" disabled>Aucun utilisateur disponible pour ce département</option>');
+                        } else {
+                            data.forEach(function(user) {
+                                const fullName = (user.first_name && user.last_name)
+                                    ? user.first_name + ' ' + user.last_name
+                                    : user.username;
+                                recipientSelect.append(
+                                    $('<option></option>')
+                                        .val(user.id)
+                                        .text(fullName + ' (' + user.role_display + ')')
+                                );
+                            });
+                        }
+
+                        // Réinitialiser Select2
+                        recipientSelect.select2({
+                            theme: 'bootstrap-5',
+                            placeholder: '-- Sélectionner un destinataire --',
+                            allowClear: true
+                        });
+                    },
+                    error: function() {
+                        recipientSelect.empty().append('<option value="">-- Erreur de chargement --</option>');
+                    }
+                });
+            }
+        } else {
+            // Cacher le champ destinataire pour RETURNED_ASC
+            recipientField.hide();
+            recipientSelect.prop('required', false);
+            recipientSelect.val('').trigger('change');
+        }
+    });
+});
+</script>
+{% endblock %}

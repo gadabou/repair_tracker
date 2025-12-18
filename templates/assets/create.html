@@ -1,0 +1,238 @@
+{% extends 'base.html' %}
+
+{% block title %}Créer un Équipement - Repair Tracker{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="bi bi-phone-fill"></i> Créer un Équipement</h1>
+    <a href="{% url 'assets:list' %}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Retour à la liste
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-md-10 mx-auto">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-plus-circle"></i> Informations de l'équipement</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data" id="equipmentForm">
+                    {% csrf_token %}
+
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <h6 class="text-primary"><i class="bi bi-info-circle"></i> Identification</h6>
+                            <hr>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="equipment_type" class="form-label">
+                                Type d'équipement <span class="text-danger">*</span>
+                            </label>
+                            <select class="form-select" id="equipment_type" name="equipment_type" required>
+                                <option value="">-- Sélectionner un type --</option>
+                                {% for value, label in equipment_types %}
+                                <option value="{{ value }}">{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="brand" class="form-label">
+                                Marque <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control" id="brand" name="brand" required
+                                   placeholder="Ex: Samsung, Tecno, iPhone...">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="model" class="form-label">
+                                Modèle <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control" id="model" name="model" required
+                                   placeholder="Ex: Galaxy A52, Spark 10...">
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label for="imei" class="form-label">
+                                IMEI / Numéro de série <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control" id="imei" name="imei" required
+                                   placeholder="Numéro unique de l'appareil">
+                            <small class="form-text text-muted">
+                                Doit être unique. Pour un téléphone: *#06# pour obtenir l'IMEI
+                            </small>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="serial_number" class="form-label">
+                                Numéro de série additionnel
+                            </label>
+                            <input type="text" class="form-control" id="serial_number" name="serial_number"
+                                   placeholder="Numéro de série supplémentaire (optionnel)">
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <h6 class="text-primary"><i class="bi bi-gear"></i> État et Propriétaire</h6>
+                            <hr>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="status" class="form-label">
+                                État <span class="text-danger">*</span>
+                            </label>
+                            <select class="form-select" id="status" name="status" required>
+                                {% for value, label in status_choices %}
+                                <option value="{{ value }}" {% if value == 'FUNCTIONAL' %}selected{% endif %}>
+                                    {{ label }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="owner" class="form-label">
+                                Propriétaire ASC
+                            </label>
+                            <select class="form-select" id="owner" name="owner">
+                                <option value="">-- Non attribué (optionnel) --</option>
+                                {% for asc in ascs %}
+                                <option value="{{ asc.id }}">
+                                    {{ asc.get_full_name }} ({{ asc.code }}) - {{ asc.formation_sanitaire }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <small class="form-text text-muted">
+                                Vous pouvez attribuer l'équipement plus tard
+                            </small>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <h6 class="text-primary"><i class="bi bi-calendar-event"></i> Dates importantes</h6>
+                            <hr>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="acquisition_date" class="form-label">
+                                Date d'acquisition
+                            </label>
+                            <input type="date" class="form-control" id="acquisition_date" name="acquisition_date">
+                            <small class="form-text text-muted">Date d'achat ou de réception</small>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="warranty_expiry_date" class="form-label">
+                                Expiration de la garantie
+                            </label>
+                            <input type="date" class="form-control" id="warranty_expiry_date" name="warranty_expiry_date">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="assignment_date" class="form-label">
+                                Date d'attribution
+                            </label>
+                            <input type="date" class="form-control" id="assignment_date" name="assignment_date">
+                            <small class="form-text text-muted">Si déjà attribué à un ASC</small>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <h6 class="text-primary"><i class="bi bi-file-earmark"></i> Documents et Notes</h6>
+                            <hr>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="reception_form" class="form-label">
+                                Fiche de réception
+                            </label>
+                            <input type="file" class="form-control" id="reception_form" name="reception_form"
+                                   accept=".pdf,.jpg,.jpeg,.png">
+                            <small class="form-text text-muted">
+                                Document de réception signé (PDF ou image)
+                            </small>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="notes" class="form-label">Notes</label>
+                            <textarea class="form-control" id="notes" name="notes" rows="3"
+                                      placeholder="Informations complémentaires sur cet équipement..."></textarea>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'assets:list' %}" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Annuler
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Créer l'équipement
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Show/hide assignment date based on owner selection
+    $('#owner').on('change', function() {
+        var ownerId = $(this).val();
+        if (ownerId) {
+            // Set assignment date to today if not already set
+            var assignmentDate = $('#assignment_date').val();
+            if (!assignmentDate) {
+                var today = new Date().toISOString().split('T')[0];
+                $('#assignment_date').val(today);
+            }
+        } else {
+            // Clear assignment date if no owner selected
+            $('#assignment_date').val('');
+        }
+    });
+
+    // Form validation
+    $('#equipmentForm').on('submit', function(e) {
+        var imei = $('#imei').val().trim();
+        var brand = $('#brand').val().trim();
+        var model = $('#model').val().trim();
+
+        // IMEI validation (basic check)
+        if (imei.length < 5) {
+            e.preventDefault();
+            alert('L\'IMEI / Numéro de série doit contenir au moins 5 caractères.');
+            $('#imei').focus();
+            return false;
+        }
+
+        // Brand and model validation
+        if (brand.length < 2 || model.length < 2) {
+            e.preventDefault();
+            alert('La marque et le modèle doivent contenir au moins 2 caractères.');
+            return false;
+        }
+
+        // Date validation
+        var acquisitionDate = $('#acquisition_date').val();
+        var warrantyDate = $('#warranty_expiry_date').val();
+
+        if (acquisitionDate && warrantyDate) {
+            if (new Date(warrantyDate) < new Date(acquisitionDate)) {
+                e.preventDefault();
+                alert('La date d\'expiration de la garantie ne peut pas être antérieure à la date d\'acquisition.');
+                $('#warranty_expiry_date').focus();
+                return false;
+            }
+        }
+
+        return true;
+    });
+
+    // Uppercase IMEI automatically
+    $('#imei').on('input', function() {
+        $(this).val($(this).val().toUpperCase());
+    });
+});
+</script>
+{% endblock %}

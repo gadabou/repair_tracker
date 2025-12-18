@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block title %}Annuler le Ticket {{ ticket.ticket_number }} - Repair Tracker{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h4 class="mb-0">
+                    <i class="bi bi-x-circle"></i> Annuler le Ticket
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    <strong>Attention!</strong> Vous êtes sur le point d'annuler ce ticket de réparation.
+                    Cette action changera le statut du ticket et remettra l'équipement en état "En panne".
+                </div>
+
+                <div class="mb-4">
+                    <h5>Informations du ticket</h5>
+                    <table class="table table-sm">
+                        <tr>
+                            <th style="width: 30%;">Numéro:</th>
+                            <td><strong>{{ ticket.ticket_number }}</strong></td>
+                        </tr>
+                        <tr>
+                            <th>Équipement:</th>
+                            <td>{{ ticket.equipment }}</td>
+                        </tr>
+                        <tr>
+                            <th>ASC:</th>
+                            <td>{{ ticket.asc.get_full_name }}</td>
+                        </tr>
+                        <tr>
+                            <th>Statut actuel:</th>
+                            <td>
+                                <span class="badge bg-{% if ticket.status == 'CLOSED' %}success{% elif ticket.status == 'OPEN' %}warning{% else %}primary{% endif %}">
+                                    {{ ticket.get_status_display }}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Étape actuelle:</th>
+                            <td><span class="badge bg-secondary">{{ ticket.get_current_stage_display }}</span></td>
+                        </tr>
+                    </table>
+                </div>
+
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="cancellation_reason" class="form-label">
+                            <strong>Raison de l'annulation</strong> <span class="text-danger">*</span>
+                        </label>
+                        <textarea
+                            class="form-control"
+                            id="cancellation_reason"
+                            name="cancellation_reason"
+                            rows="4"
+                            required
+                            placeholder="Expliquez pourquoi ce ticket est annulé (ex: équipement perdu, réparation non nécessaire, erreur de création, etc.)"
+                        ></textarea>
+                        <small class="form-text text-muted">
+                            Cette raison sera enregistrée dans l'historique du ticket.
+                        </small>
+                    </div>
+
+                    <hr>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'tickets:detail' ticket.pk %}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Retour
+                        </a>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-x-circle"></i> Confirmer l'annulation
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,296 @@
+{% extends 'base.html' %}
+{% load ticket_tags %}
+{% block title %}{{ ticket.ticket_number }} - Repair Tracker{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="bi bi-ticket-perforated"></i> {{ ticket.ticket_number }}</h1>
+    <div>
+        <a href="{% url 'tickets:list' %}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Retour à la liste
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <!-- Informations principales -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Informations du Ticket</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Équipement:</strong><br>{{ ticket.equipment }}</p>
+                        <p><strong>ASC Propriétaire:</strong><br>{{ ticket.asc.get_full_name }} ({{ ticket.asc.code }})</p>
+                        <p><strong>Priorité:</strong><br>
+                            {% if ticket.priority == 'LOW' %}
+                                <span class="badge bg-secondary">{{ ticket.get_priority_display }}</span>
+                            {% elif ticket.priority == 'NORMAL' %}
+                                <span class="badge bg-info">{{ ticket.get_priority_display }}</span>
+                            {% else %}
+                                <span class="badge bg-danger">{{ ticket.get_priority_display }}</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Statut:</strong><br>
+                            <span class="badge bg-{% if ticket.status == 'CLOSED' %}success{% elif ticket.status == 'OPEN' %}warning{% else %}primary{% endif %}">
+                                {{ ticket.get_status_display }}
+                            </span>
+                        </p>
+                        <p><strong>Étape actuelle:</strong><br>
+                            <span class="badge bg-secondary fs-6">{{ ticket.get_current_stage_display }}</span>
+                        </p>
+                        <p><strong>Délai:</strong><br>
+                            <span class="badge bg-{{ ticket.get_delay_color }} fs-6">{{ ticket.get_delay_days }} jours</span>
+                        </p>
+                        {% if ticket.current_holder %}
+                        <p><strong>Détenteur actuel:</strong><br>{{ ticket.current_holder.get_full_name }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+                <hr>
+                <div>
+                    <p><strong>Description du problème initial:</strong></p>
+                    <p class="text-muted">{{ ticket.initial_problem_description }}</p>
+                </div>
+                {% if ticket.resolution_notes %}
+                <hr>
+                <div>
+                    <p><strong>Notes de résolution:</strong></p>
+                    <p class="text-success">{{ ticket.resolution_notes }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Types de problèmes -->
+        {% if issues %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Types de Problèmes</h5>
+            </div>
+            <div class="card-body">
+                {% for issue in issues %}
+                <span class="badge bg-warning text-dark me-2">{{ issue.get_issue_type_display }}</span>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Timeline des événements -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-clock-history"></i> Timeline des Événements</h5>
+            </div>
+            <div class="card-body">
+                {% for event in events %}
+                <div class="border-start border-3 border-primary ps-3 pb-3 mb-3">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="mb-1">
+                                <span class="badge bg-{% if event.event_type == 'CREATED' %}info{% elif event.event_type == 'SENT' %}primary{% elif event.event_type == 'RECEIVED' %}success{% elif event.event_type == 'REPAIRED' %}warning{% else %}secondary{% endif %}">
+                                    {{ event.get_event_type_display }}
+                                </span>
+                            </h6>
+                            {% if event.from_role and event.to_role %}
+                            <p class="mb-1 small text-muted">
+                                {{ event.get_from_role_display }} → {{ event.get_to_role_display }}
+                            </p>
+                            {% endif %}
+                            {% if event.comment %}
+                            <p class="mb-1">{{ event.comment }}</p>
+                            {% endif %}
+                            <small class="text-muted">Par: {{ event.user.get_full_name }}</small>
+                        </div>
+                        <small class="text-muted">{{ event.timestamp|date:"d/m/Y H:i" }}</small>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-muted text-center">Aucun événement</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Commentaires -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-chat-left-text"></i> Commentaires</h5>
+            </div>
+            <div class="card-body">
+                {% for comment in comments %}
+                <div class="mb-3 pb-3 border-bottom">
+                    <div class="d-flex justify-content-between">
+                        <strong>{{ comment.user.get_full_name }}</strong>
+                        <small class="text-muted">{{ comment.created_at|date:"d/m/Y H:i" }}</small>
+                    </div>
+                    <p class="mb-0 mt-2">{{ comment.comment }}</p>
+                </div>
+                {% empty %}
+                <p class="text-muted text-center">Aucun commentaire</p>
+                {% endfor %}
+
+                <!-- Formulaire d'ajout de commentaire -->
+                <form method="post" action="{% url 'tickets:add_comment' ticket.pk %}" class="mt-3">
+                    {% csrf_token %}
+                    <div class="input-group">
+                        <textarea name="comment" class="form-control" placeholder="Ajouter un commentaire..." rows="2" required></textarea>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-send"></i> Envoyer
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <!-- Actions disponibles -->
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="bi bi-lightning"></i> Actions</h5>
+            </div>
+            <div class="card-body">
+                {% if ticket.status == 'CLOSED' %}
+                    <div class="alert alert-success mb-0">
+                        <i class="bi bi-check-circle"></i> Ticket clôturé
+                    </div>
+                {% elif ticket.status == 'CANCELLED' %}
+                    <div class="alert alert-danger mb-0">
+                        <i class="bi bi-x-circle"></i> Ticket annulé
+                        {% if ticket.cancellation_reason %}
+                        <hr>
+                        <small><strong>Raison:</strong> {{ ticket.cancellation_reason }}</small>
+                        {% endif %}
+                    </div>
+                {% else %}
+                    <!-- Bouton Confirmer réception -->
+                    {% if not ticket.current_holder %}
+                    <a href="{% url 'tickets:receive' ticket.pk %}" class="btn btn-success w-100 mb-2">
+                        <i class="bi bi-box-arrow-in-down"></i> Confirmer la Réception
+                    </a>
+                    {% endif %}
+
+                    <!-- Bouton Marquer comme réparé (pour réparateurs) -->
+                    {% if ticket.current_stage == 'REPAIRER' or ticket.current_stage == 'ESANTE' %}
+                        {% if ticket.status != 'REPAIRED' %}
+                        <a href="{% url 'tickets:mark_repaired' ticket.pk %}" class="btn btn-warning w-100 mb-2">
+                            <i class="bi bi-wrench"></i> Marquer comme Réparé
+                        </a>
+                        {% endif %}
+                    {% endif %}
+
+                    <!-- Bouton Envoyer (si détenteur) -->
+                    {% if ticket.current_holder %}
+                    <a href="{% url 'tickets:send' ticket.pk %}" class="btn btn-primary w-100 mb-2">
+                        <i class="bi bi-send"></i> Envoyer à l'Étape Suivante
+                    </a>
+                    {% endif %}
+
+                    <!-- Bouton Annuler -->
+                    <a href="{% url 'tickets:cancel' ticket.pk %}" class="btn btn-danger w-100 mb-2"
+                       onclick="return confirm('Êtes-vous sûr de vouloir annuler ce ticket ?');">
+                        <i class="bi bi-x-circle"></i> Annuler le Ticket
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Guide du workflow -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="bi bi-diagram-3"></i> Workflow</h6>
+            </div>
+            <div class="card-body">
+                <div class="small">
+                    <p class="mb-2"><strong>Aller (Vers réparation):</strong></p>
+                    <ol class="ps-3 mb-3">
+                        <li class="{% if ticket.current_stage == 'SUPERVISOR' %}fw-bold text-primary{% endif %}">Superviseur</li>
+                        <li class="{% if ticket.current_stage == 'PROGRAM' %}fw-bold text-primary{% endif %}">Programme</li>
+                        <li class="{% if ticket.current_stage == 'LOGISTICS' %}fw-bold text-primary{% endif %}">Logistique</li>
+                        <li class="{% if ticket.current_stage == 'REPAIRER' or ticket.current_stage == 'ESANTE' %}fw-bold text-primary{% endif %}">Réparateur / E-Santé</li>
+                    </ol>
+                    <p class="mb-2"><strong>Retour (Après réparation):</strong></p>
+                    <ol class="ps-3 mb-0" start="5">
+                        <li class="{% if ticket.current_stage == 'RETURNING_LOGISTICS' %}fw-bold text-success{% endif %}">Retour - Logistique</li>
+                        <li class="{% if ticket.current_stage == 'RETURNING_PROGRAM' %}fw-bold text-success{% endif %}">Retour - Programme</li>
+                        <li class="{% if ticket.current_stage == 'RETURNING_SUPERVISOR' %}fw-bold text-success{% endif %}">Retour - Superviseur</li>
+                        <li class="{% if ticket.current_stage == 'RETURNED_ASC' %}fw-bold text-success{% endif %}">Retourné à l'ASC</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <!-- Temps par département -->
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h6 class="mb-0"><i class="bi bi-hourglass-split"></i> Temps par Département</h6>
+            </div>
+            <div class="card-body">
+                {% with time_by_stage=ticket.get_time_by_stage %}
+                    {% if time_by_stage %}
+                        <div class="table-responsive">
+                            <table class="table table-sm mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Département</th>
+                                        <th class="text-end">Durée</th>
+                                        <th class="text-end">État</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for stage, days in time_by_stage.items %}
+                                    <tr class="{% if stage == ticket.current_stage %}table-active{% endif %}">
+                                        <td>
+                                            {{ ticket.STAGE_CHOICES|lookup:stage }}
+                                            {% if stage == ticket.current_stage %}
+                                                <i class="bi bi-arrow-right-circle-fill text-primary"></i>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-end">{{ days }} jour{{ days|pluralize }}</td>
+                                        <td class="text-end">
+                                            {% if stage == ticket.current_stage %}
+                                                {% if days >= 14 %}
+                                                    <span class="badge bg-danger">Rouge</span>
+                                                {% elif days >= 7 %}
+                                                    <span class="badge bg-warning">Jaune</span>
+                                                {% else %}
+                                                    <span class="badge bg-success">Vert</span>
+                                                {% endif %}
+                                            {% else %}
+                                                <span class="badge bg-secondary">Terminé</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                                <tfoot>
+                                    <tr class="fw-bold">
+                                        <td>Total</td>
+                                        <td class="text-end" colspan="2">
+                                            {{ ticket.get_delay_days }} jour{{ ticket.get_delay_days|pluralize }}
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted text-center mb-0">Aucune donnée disponible</p>
+                    {% endif %}
+                {% endwith %}
+
+                <div class="mt-3 small">
+                    <p class="mb-1"><strong>Légende:</strong></p>
+                    <ul class="list-unstyled mb-0">
+                        <li><span class="badge bg-success">Vert</span> : Moins de 7 jours</li>
+                        <li><span class="badge bg-warning">Jaune</span> : 7 à 13 jours (rappel envoyé)</li>
+                        <li><span class="badge bg-danger">Rouge</span> : 14 jours ou plus (rappel urgent)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

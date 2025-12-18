@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+
+{% block title %}Créer un ASC - Repair Tracker{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="bi bi-person-plus"></i> Créer un ASC</h1>
+    <a href="{% url 'accounts:asc_list' %}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Retour à la liste
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-md-10 mx-auto">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-person-badge"></i> Informations de l'ASC</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" id="ascForm">
+                    {% csrf_token %}
+
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <h6 class="text-primary"><i class="bi bi-person"></i> Identité</h6>
+                            <hr>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="first_name" class="form-label">
+                                Préname <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control" id="first_name" name="first_name" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="last_name" class="form-label">
+                                name <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control" id="last_name" name="last_name" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="code" class="form-label">
+                                Code ASC <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control" id="code" name="code" required
+                                   placeholder="Ex: ASC-001">
+                            <small class="form-text text-muted">Doit être unique</small>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <label for="gender" class="form-label">Genre</label>
+                            <select class="form-select" id="gender" name="gender">
+                                <option value="">-- Sélectionner --</option>
+                                {% for value, label in gender_choices %}
+                                <option value="{{ value }}">{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="phone" class="form-label">
+                                Téléphone <span class="text-danger">*</span>
+                            </label>
+                            <input type="tel" class="form-control" id="phone" name="phone" required
+                                   placeholder="+228 XX XX XX XX">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email"
+                                   placeholder="exemple@email.com">
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <h6 class="text-primary"><i class="bi bi-geo-alt"></i> Localisation</h6>
+                            <hr>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="formation_sanitaire" class="form-label">
+                                Formation Sanitaire <span class="text-danger">*</span>
+                            </label>
+                            <select class="form-select" id="formation_sanitaire" name="formation_sanitaire" required>
+                                <option value="">-- Sélectionner une formation sanitaire --</option>
+                                {% for fs in formations_sanitaires %}
+                                <option value="{{ fs.id }}">
+                                    {{ fs.name }} - {{ fs.commune.name }} ({{ fs.commune.district.name }})
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="zone_asc" class="form-label">Zone ASC</label>
+                            <select class="form-select" id="zone_asc" name="zone_asc">
+                                <option value="">-- Sélectionner une zone (optionnel) --</option>
+                                {% for zone in zones_asc %}
+                                <option value="{{ zone.id }}">{{ zone.name }} - {{ zone.formation_sanitaire.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <h6 class="text-primary"><i class="bi bi-briefcase"></i> Affectation</h6>
+                            <hr>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="supervisor" class="form-label">Superviseur</label>
+                            <select class="form-select" id="supervisor" name="supervisor">
+                                <option value="">-- Sélectionner un superviseur (optionnel) --</option>
+                                {% for sup in supervisors %}
+                                <option value="{{ sup.id }}">{{ sup.get_full_name }} ({{ sup.email }})</option>
+                                {% endfor %}
+                            </select>
+                            <small class="form-text text-muted">Responsable du suivi de cet ASC</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="start_date" class="form-label">Date de début</label>
+                            <input type="date" class="form-control" id="start_date" name="start_date">
+                            <small class="form-text text-muted">Date de début d'activité</small>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <h6 class="text-primary"><i class="bi bi-card-text"></i> Informations complémentaires</h6>
+                            <hr>
+                        </div>
+                        <div class="col-md-12">
+                            <label for="notes" class="form-label">Notes</label>
+                            <textarea class="form-control" id="notes" name="notes" rows="3"
+                                      placeholder="Informations complémentaires sur cet ASC..."></textarea>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'accounts:asc_list' %}" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Annuler
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Créer l'ASC
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Auto-generate code based on names (optional helper)
+    $('#first_name, #last_name').on('blur', function() {
+        var firstName = $('#first_name').val().trim();
+        var lastName = $('#last_name').val().trim();
+        var currentCode = $('#code').val().trim();
+
+        // Only auto-generate if code field is empty
+        if (firstName && lastName && !currentCode) {
+            var code = 'ASC-' + firstName.substring(0, 2).toUpperCase() +
+                       lastName.substring(0, 2).toUpperCase() + '-' +
+                       Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+            $('#code').val(code);
+        }
+    });
+
+    // Form validation
+    $('#ascForm').on('submit', function(e) {
+        var phone = $('#phone').val().trim();
+        var code = $('#code').val().trim();
+
+        // Basic phone validation
+        if (phone && phone.length < 8) {
+            e.preventDefault();
+            alert('Le numéro de téléphone doit contenir au moins 8 chiffres.');
+            $('#phone').focus();
+            return false;
+        }
+
+        // Code validation
+        if (code.length < 3) {
+            e.preventDefault();
+            alert('Le code ASC doit contenir au moins 3 caractères.');
+            $('#code').focus();
+            return false;
+        }
+
+        return true;
+    });
+});
+</script>
+{% endblock %}

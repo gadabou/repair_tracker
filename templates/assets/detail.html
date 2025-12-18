@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="bi bi-phone"></i> Détail de l'Équipement</h1>
+    <div>
+        <a href="{% url 'assets:assign' equipment.pk %}" class="btn btn-success">
+            <i class="bi bi-person-check"></i> Attribuer à un ASC
+        </a>
+        <a href="{% url 'assets:list' %}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Retour
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Informations Générales</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-borderless mb-0">
+                    <tr>
+                        <th width="40%">Type:</th>
+                        <td>{{ equipment.get_equipment_type_display }}</td>
+                    </tr>
+                    <tr>
+                        <th>Marque:</th>
+                        <td>{{ equipment.brand }}</td>
+                    </tr>
+                    <tr>
+                        <th>Modèle:</th>
+                        <td>{{ equipment.model }}</td>
+                    </tr>
+                    <tr>
+                        <th>IMEI:</th>
+                        <td><code>{{ equipment.imei }}</code></td>
+                    </tr>
+                    {% if equipment.serial_number %}
+                    <tr>
+                        <th>Numéro de série:</th>
+                        <td><code>{{ equipment.serial_number }}</code></td>
+                    </tr>
+                    {% endif %}
+                    <tr>
+                        <th>Statut:</th>
+                        <td>
+                            <span class="badge bg-{{ equipment.get_status_color }}">
+                                {{ equipment.get_status_display }}
+                            </span>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">Propriétaire (ASC)</h5>
+            </div>
+            <div class="card-body">
+                {% if equipment.owner %}
+                    <h6>{{ equipment.owner.get_full_name }}</h6>
+                    <p class="mb-1"><small class="text-muted">Code: {{ equipment.owner.code }}</small></p>
+                    <p class="mb-1"><small class="text-muted">Téléphone: {{ equipment.owner.phone }}</small></p>
+                    <p class="mb-0"><small class="text-muted">Formation Sanitaire: {{ equipment.owner.formation_sanitaire }}</small></p>
+                {% else %}
+                    <p class="text-warning mb-0">
+                        <i class="bi bi-exclamation-triangle"></i> Cet équipement n'est pas encore assigné à un ASC.
+                    </p>
+                    <a href="{% url 'assets:assign' equipment.pk %}" class="btn btn-success btn-sm mt-2">
+                        <i class="bi bi-person-check"></i> Attribuer maintenant
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if equipment.notes %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Notes</h5>
+            </div>
+            <div class="card-body">
+                <p class="mb-0">{{ equipment.notes }}</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="col-md-6">
+        {% if history %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-clock-history"></i> Historique</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group list-group-flush">
+                    {% for h in history %}
+                    <div class="list-group-item px-0">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ h.get_action_display }}</h6>
+                            <small class="text-muted">{{ h.created_at|date:"d/m/Y H:i" }}</small>
+                        </div>
+                        {% if h.old_value or h.new_value %}
+                        <p class="mb-1 small">
+                            {% if h.old_value %}<span class="text-muted">{{ h.old_value }}</span> → {% endif %}
+                            <span class="text-success">{{ h.new_value }}</span>
+                        </p>
+                        {% endif %}
+                        {% if h.notes %}
+                        <p class="mb-1 small text-muted">{{ h.notes }}</p>
+                        {% endif %}
+                        {% if h.created_by %}
+                        <small class="text-muted">Par: {{ h.created_by.get_full_name }}</small>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if tickets %}
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-ticket-perforated"></i> Tickets de Réparation</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group list-group-flush">
+                    {% for ticket in tickets %}
+                    <a href="{% url 'tickets:detail' ticket.pk %}" class="list-group-item list-group-item-action px-0">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ ticket.ticket_number }}</h6>
+                            <small class="text-muted">{{ ticket.created_at|date:"d/m/Y" }}</small>
+                        </div>
+                        <p class="mb-1 small">{{ ticket.initial_problem_description|truncatewords:15 }}</p>
+                        <small>
+                            <span class="badge bg-primary">{{ ticket.get_status_display }}</span>
+                            <span class="badge bg-secondary">{{ ticket.get_current_stage_display }}</span>
+                        </small>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

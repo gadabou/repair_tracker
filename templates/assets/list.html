@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="bi bi-phone"></i> Équipements</h1>
+    <a href="{% url 'assets:create' %}" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> Nouvel Équipement
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>IMEI</th>
+                        <th>Type</th>
+                        <th>Marque / Modèle</th>
+                        <th>Propriétaire (ASC)</th>
+                        <th>Statut</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for eq in equipments %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'assets:detail' eq.pk %}" class="text-decoration-none">
+                                {{ eq.imei }}
+                            </a>
+                        </td>
+                        <td>{{ eq.get_equipment_type_display }}</td>
+                        <td>{{ eq.brand }} {{ eq.model }}</td>
+                        <td>
+                            {% if eq.owner %}
+                                <span class="badge bg-info">{{ eq.owner.get_full_name }}</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Non assigné</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge bg-{{ eq.get_status_color }}">
+                                {{ eq.get_status_display }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm" role="group">
+                                <a href="{% url 'assets:detail' eq.pk %}" class="btn btn-outline-primary" title="Détails">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a href="{% url 'assets:assign' eq.pk %}" class="btn btn-outline-success" title="Attribuer à un ASC">
+                                    <i class="bi bi-person-check"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-4">
+                            <i class="bi bi-inbox" style="font-size: 3rem;"></i>
+                            <p class="mt-2">Aucun équipement trouvé</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

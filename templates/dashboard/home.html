@@ -1,0 +1,190 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Repair Tracker{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">
+            <i class="bi bi-speedometer2"></i> Tableau de Bord
+        </h1>
+    </div>
+</div>
+
+<!-- Statistiques globales -->
+<div class="row mb-4">
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <h5 class="card-title">Total Tickets</h5>
+                <h2 class="display-4">{{ total_tickets }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="card bg-warning text-dark">
+            <div class="card-body">
+                <h5 class="card-title">Ouverts</h5>
+                <h2 class="display-4">{{ open_tickets }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <h5 class="card-title">En cours</h5>
+                <h2 class="display-4">{{ in_progress_tickets }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <h5 class="card-title">Clôturés</h5>
+                <h2 class="display-4">{{ closed_tickets }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Indicateurs de délai -->
+<div class="row mb-4">
+    <div class="col-md-4 mb-3">
+        <div class="card border-danger">
+            <div class="card-body">
+                <h5 class="card-title text-danger">
+                    <i class="bi bi-exclamation-triangle-fill"></i> Tickets Rouges (> 14 jours)
+                </h5>
+                <h2 class="display-4">{{ red_count }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card border-warning">
+            <div class="card-body">
+                <h5 class="card-title text-warning">
+                    <i class="bi bi-exclamation-circle-fill"></i> Tickets Jaunes (8-14 jours)
+                </h5>
+                <h2 class="display-4">{{ yellow_count }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card border-success">
+            <div class="card-body">
+                <h5 class="card-title text-success">
+                    <i class="bi bi-check-circle-fill"></i> Tickets Verts (≤ 7 jours)
+                </h5>
+                <h2 class="display-4">{{ green_count }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Durée moyenne et top blocages -->
+<div class="row mb-4">
+    <div class="col-md-6 mb-3">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="bi bi-clock-history"></i> Durée Moyenne de Traitement</h5>
+            </div>
+            <div class="card-body text-center">
+                {% if avg_duration %}
+                    <h1 class="display-3">{{ avg_duration }}</h1>
+                    <p class="text-muted">jours en moyenne</p>
+                {% else %}
+                    <p class="text-muted">Aucune donnée disponible</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-3">
+        <div class="card">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0"><i class="bi bi-graph-up"></i> Top 5 des Points de Blocage</h5>
+            </div>
+            <div class="card-body">
+                {% if top_blockages %}
+                    <ul class="list-group">
+                        {% for stage, count in top_blockages %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            {{ stage }}
+                            <span class="badge bg-danger rounded-pill">{{ count }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted">Aucun blocage détecté</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tickets rouges récents -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0"><i class="bi bi-list-ul"></i> Tickets Rouges Récents</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_red_tickets %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Numéro</th>
+                                    <th>Équipement</th>
+                                    <th>ASC</th>
+                                    <th>Étape actuelle</th>
+                                    <th>Délai</th>
+                                    <th>Priorité</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for ticket in recent_red_tickets %}
+                                <tr>
+                                    <td><a href="{% url 'tickets:detail' ticket.pk %}">{{ ticket.ticket_number }}</a></td>
+                                    <td>{{ ticket.equipment }}</td>
+                                    <td>{{ ticket.asc.get_full_name }}</td>
+                                    <td>{{ ticket.get_current_stage_display }}</td>
+                                    <td><span class="badge bg-{{ ticket.get_delay_color }}">{{ ticket.get_delay_days }} jours</span></td>
+                                    <td><span class="badge bg-secondary">{{ ticket.get_priority_display }}</span></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted">Aucun ticket rouge</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Autres statistiques -->
+<div class="row">
+    <div class="col-md-6 mb-3">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-people"></i> ASCs Actifs</h5>
+            </div>
+            <div class="card-body text-center">
+                <h2 class="display-4">{{ total_ascs }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-3">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-phone"></i> Équipements Totaux</h5>
+            </div>
+            <div class="card-body text-center">
+                <h2 class="display-4">{{ total_equipment }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

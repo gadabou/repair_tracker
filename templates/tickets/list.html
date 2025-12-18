@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block title %}Tickets - Repair Tracker{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h1><i class="bi bi-ticket-perforated"></i> Tickets de Réparation</h1>
+    </div>
+    <div class="col-auto">
+        <a href="{% url 'tickets:create' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Nouveau Ticket
+        </a>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-4">
+                <input type="text" name="search" class="form-control" placeholder="Rechercher..." value="{{ request.GET.search }}">
+            </div>
+            <div class="col-md-3">
+                <select name="status" class="form-select">
+                    <option value="">Tous les statuts</option>
+                    {% for value, label in status_choices %}
+                    <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select name="stage" class="form-select">
+                    <option value="">Toutes les étapes</option>
+                    {% for value, label in stage_choices %}
+                    <option value="{{ value }}" {% if request.GET.stage == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Filtrer</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Numéro</th>
+                        <th>Équipement</th>
+                        <th>ASC</th>
+                        <th>Statut</th>
+                        <th>Étape</th>
+                        <th>Priorité</th>
+                        <th>Délai</th>
+                        <th>Date création</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ticket in tickets %}
+                    <tr>
+                        <td><strong>{{ ticket.ticket_number }}</strong></td>
+                        <td>{{ ticket.equipment }}</td>
+                        <td>{{ ticket.asc.get_full_name }}</td>
+                        <td>
+                            <span class="badge bg-{% if ticket.status == 'CLOSED' %}success{% elif ticket.status == 'CANCELLED' %}danger{% elif ticket.status == 'OPEN' %}warning{% elif ticket.status == 'REPAIRED' %}info{% else %}primary{% endif %}">
+                                {{ ticket.get_status_display }}
+                            </span>
+                        </td>
+                        <td><span class="badge bg-secondary">{{ ticket.get_current_stage_display }}</span></td>
+                        <td><span class="badge bg-warning">{{ ticket.get_priority_display }}</span></td>
+                        <td><span class="badge bg-{{ ticket.get_delay_color }}">{{ ticket.get_delay_days }} jours</span></td>
+                        <td>{{ ticket.created_at|date:"d/m/Y H:i" }}</td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a href="{% url 'tickets:detail' ticket.pk %}" class="btn btn-sm btn-primary" title="Voir les détails">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                {% if ticket.status not in 'CLOSED CANCELLED' %}
+                                <a href="{% url 'tickets:cancel' ticket.pk %}" class="btn btn-sm btn-danger" title="Annuler le ticket"
+                                   onclick="return confirm('Êtes-vous sûr de vouloir annuler ce ticket ?');">
+                                    <i class="bi bi-x-circle"></i>
+                                </a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="9" class="text-center text-muted">Aucun ticket trouvé</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block extra_css %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="bi bi-person-check"></i> Attribuer un Équipement</h4>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <h5>Équipement à attribuer</h5>
+                    <p class="mb-1"><strong>{{ equipment.brand }} {{ equipment.model }}</strong></p>
+                    <p class="mb-1"><small class="text-muted">IMEI: {{ equipment.imei }}</small></p>
+                    {% if equipment.owner %}
+                    <p class="mb-0">
+                        <small>Propriétaire actuel: <strong>{{ equipment.owner.get_full_name }}</strong> ({{ equipment.owner.code }})</small>
+                    </p>
+                    {% else %}
+                    <p class="mb-0"><small class="text-warning">Non assigné</small></p>
+                    {% endif %}
+                </div>
+
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="asc_select" class="form-label">Sélectionner un ASC <span class="text-danger">*</span></label>
+                        <select id="asc_select" name="asc" class="form-control" required>
+                            <option value="">-- Rechercher et sélectionner un ASC --</option>
+                        </select>
+                        <small class="form-text text-muted">
+                            Commencez à taper pour rechercher un ASC par nom ou code
+                        </small>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'assets:detail' equipment.pk %}" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Annuler
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Attribuer
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('#asc_select').select2({
+        theme: 'bootstrap-5',
+        placeholder: '-- Rechercher et sélectionner un ASC --',
+        allowClear: true,
+        ajax: {
+            url: '/api/ascs/',
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+                return {
+                    search: params.term,
+                    page: params.page || 1
+                };
+            },
+            processResults: function (data) {
+                return {
+                    results: data.results.map(function(asc) {
+                        return {
+                            id: asc.id,
+                            text: asc.first_name + ' ' + asc.last_name + ' (' + asc.code + ') - ' + asc.formation_sanitaire_name
+                        };
+                    })
+                };
+            },
+            cache: true
+        },
+        minimumInputLength: 0
+    });
+});
+</script>
+{% endblock %}

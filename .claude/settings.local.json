@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pip3:*)",
+      "Bash(python3:*)",
+      "Bash(~/.local/bin/django-admin startproject:*)",
+      "Bash(timeout 5 python3:*)",
+      "Bash(tree:*)",
+      "Bash(ls:*)",
+      "Bash(source:*)",
+      "Bash(python manage.py check:*)",
+      "Bash(python manage.py makemigrations assets)",
+      "Bash(python manage.py makemigrations tickets)",
+      "Bash(cd /home/doctorpy/Integrate\\ Health\\ Dropbox/Djakpo\\ GADO/projets/repair_tracker && python manage.py migrate:*)",
+      "Bash(chmod:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

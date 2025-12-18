@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h4 class="mb-0"><i class="bi bi-box-arrow-in-down"></i> Confirmer la Réception</h4>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <h5><i class="bi bi-ticket-perforated"></i> {{ ticket.ticket_number }}</h5>
+                    <p class="mb-1"><strong>Équipement:</strong> {{ ticket.equipment }}</p>
+                    <p class="mb-1"><strong>ASC:</strong> {{ ticket.asc.get_full_name }}</p>
+                    <p class="mb-1"><strong>Étape actuelle:</strong> <span class="badge bg-secondary">{{ ticket.get_current_stage_display }}</span></p>
+                    <p class="mb-0"><strong>Description:</strong> {{ ticket.initial_problem_description|truncatewords:20 }}</p>
+                </div>
+
+                <div class="alert alert-warning">
+                    <i class="bi bi-info-circle"></i> <strong>Important:</strong> En confirmant la réception, vous indiquez que l'équipement est maintenant entre vos mains.
+                </div>
+
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="comment" class="form-label">Commentaire / Observations</label>
+                        <textarea name="comment" id="comment" class="form-control" rows="4" placeholder="État de l'équipement à la réception, observations..."></textarea>
+                        <small class="text-muted">Notez l'état de l'équipement ou toute observation pertinente</small>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'tickets:detail' ticket.pk %}" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Annuler
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-check-circle"></i> Confirmer la Réception
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

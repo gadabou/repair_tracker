@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% block title %}Liste des ASCs - Repair Tracker{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="bi bi-people"></i> Liste des ASCs</h1>
+    <a href="{% url 'accounts:asc_create' %}" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> Nouveau ASC
+    </a>
+</div>
+
+<!-- Barre de recherche -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-10">
+                <input type="text" name="search" class="form-control" placeholder="Rechercher par nom ou code..."
+                       value="{{ request.GET.search }}">
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="bi bi-search"></i> Rechercher
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Liste des ASCs -->
+{% if ascs %}
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">{{ ascs|length }} ASC{{ ascs|length|pluralize }}</h5>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Code</th>
+                    <th>Nom Complet</th>
+                    <th>Formation Sanitaire</th>
+                    <th>Superviseur</th>
+                    <th>Équipements</th>
+                    <th>Statut</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for asc in ascs %}
+                <tr>
+                    <td><strong>{{ asc.code }}</strong></td>
+                    <td>{{ asc.get_full_name }}</td>
+                    <td>{{ asc.formation_sanitaire|default:"-" }}</td>
+                    <td>
+                        {% if asc.supervisor %}
+                        {{ asc.supervisor.get_full_name }}
+                        {% else %}
+                        <span class="text-muted">-</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="badge bg-info">{{ asc.equipments.count }}</span>
+                    </td>
+                    <td>
+                        {% if asc.is_active %}
+                        <span class="badge bg-success">Actif</span>
+                        {% else %}
+                        <span class="badge bg-secondary">Inactif</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-end">
+                        <a href="{% url 'accounts:asc_detail' asc.pk %}" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-eye"></i> Voir
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="alert alert-info">
+    <i class="bi bi-info-circle"></i>
+    {% if request.GET.search %}
+    Aucun ASC ne correspond à votre recherche.
+    {% else %}
+    Aucun ASC enregistré pour le moment.
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

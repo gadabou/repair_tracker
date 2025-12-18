@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h4 class="mb-0"><i class="bi bi-wrench"></i> Marquer la Réparation comme Terminée</h4>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <h5><i class="bi bi-ticket-perforated"></i> {{ ticket.ticket_number }}</h5>
+                    <p class="mb-1"><strong>Équipement:</strong> {{ ticket.equipment }}</p>
+                    <p class="mb-1"><strong>ASC:</strong> {{ ticket.asc.get_full_name }}</p>
+                    <p class="mb-1"><strong>Problème initial:</strong> {{ ticket.initial_problem_description }}</p>
+                    <p class="mb-0"><strong>Étape actuelle:</strong> <span class="badge bg-secondary">{{ ticket.get_current_stage_display }}</span></p>
+                </div>
+
+                <div class="alert alert-success">
+                    <i class="bi bi-check-circle"></i> <strong>Réparation terminée?</strong>
+                    <p class="mb-0 mt-2">Une fois marquée comme réparée, vous pourrez renvoyer l'équipement via le circuit de retour.</p>
+                </div>
+
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="resolution_notes" class="form-label">Notes de Résolution <span class="text-danger">*</span></label>
+                        <textarea name="resolution_notes" id="resolution_notes" class="form-control" rows="6" required placeholder="Décrivez les travaux effectués, les pièces changées, les tests réalisés..."></textarea>
+                        <small class="text-muted">Détaillez les actions effectuées pour réparer l'équipement</small>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <strong>Prochaines étapes:</strong>
+                        <ol class="mb-0 mt-2">
+                            <li>Marquer comme réparé</li>
+                            <li>Envoyer vers "Retour - Logistique"</li>
+                            <li>Suivre le circuit de retour jusqu'à l'ASC</li>
+                        </ol>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'tickets:detail' ticket.pk %}" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Annuler
+                        </a>
+                        <button type="submit" class="btn btn-warning">
+                            <i class="bi bi-check-circle"></i> Marquer comme Réparé
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

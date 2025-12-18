@@ -1,0 +1,201 @@
+{% extends 'base.html' %}
+{% block title %}{{ asc.get_full_name }} - Repair Tracker{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="bi bi-person-badge"></i> {{ asc.get_full_name }}</h1>
+    <div>
+        <a href="{% url 'accounts:asc_list' %}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Retour à la liste
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <!-- Informations de l'ASC -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-person-vcard"></i> Informations</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Code:</strong><br>{{ asc.code }}</p>
+                <p><strong>Nom:</strong><br>{{ asc.first_name }} {{ asc.last_name }}</p>
+                {% if asc.gender %}
+                <p><strong>Genre:</strong><br>{{ asc.get_gender_display }}</p>
+                {% endif %}
+                {% if asc.phone %}
+                <p><strong>Téléphone:</strong><br>{{ asc.phone }}</p>
+                {% endif %}
+                {% if asc.email %}
+                <p><strong>Email:</strong><br>{{ asc.email }}</p>
+                {% endif %}
+                <p><strong>Statut:</strong><br>
+                    {% if asc.is_active %}
+                    <span class="badge bg-success">Actif</span>
+                    {% else %}
+                    <span class="badge bg-secondary">Inactif</span>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+
+        <!-- Formation Sanitaire -->
+        {% if asc.formation_sanitaire %}
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <h6 class="mb-0"><i class="bi bi-hospital"></i> Formation Sanitaire</h6>
+            </div>
+            <div class="card-body">
+                <p class="mb-0">{{ asc.formation_sanitaire }}</p>
+                {% if asc.zone_asc %}
+                <p class="mb-0 mt-2"><strong>Zone:</strong> {{ asc.zone_asc }}</p>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Superviseur -->
+        {% if asc.supervisor %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="bi bi-person-check"></i> Superviseur</h6>
+            </div>
+            <div class="card-body">
+                <p class="mb-0">{{ asc.supervisor.get_full_name }}</p>
+                {% if asc.supervisor.email %}
+                <p class="mb-0 small text-muted">{{ asc.supervisor.email }}</p>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="col-md-8">
+        <!-- Équipements -->
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-phone"></i> Équipements ({{ equipments|length }})</h5>
+                <a href="{% url 'assets:asc_assign_equipment' asc.pk %}" class="btn btn-light btn-sm">
+                    <i class="bi bi-plus-circle"></i> Attribuer des équipements
+                </a>
+            </div>
+            <div class="card-body">
+                {% if equipments %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Marque / Modèle</th>
+                                <th>IMEI</th>
+                                <th>Statut</th>
+                                <th>Attribution</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for equipment in equipments %}
+                            <tr>
+                                <td>
+                                    <span class="badge bg-secondary">{{ equipment.get_equipment_type_display }}</span>
+                                </td>
+                                <td>
+                                    <strong>{{ equipment.brand }}</strong><br>
+                                    <small class="text-muted">{{ equipment.model }}</small>
+                                </td>
+                                <td><small>{{ equipment.imei }}</small></td>
+                                <td>
+                                    <span class="badge bg-{{ equipment.get_status_color }}">
+                                        {{ equipment.get_status_display }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if equipment.assignment_date %}
+                                    <small>{{ equipment.assignment_date|date:"d/m/Y" }}</small>
+                                    {% else %}
+                                    <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end">
+                                    <a href="{% url 'assets:detail' equipment.pk %}" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-info mb-0">
+                    <i class="bi bi-info-circle"></i> Aucun équipement attribué pour le moment.
+                    <a href="{% url 'assets:asc_assign_equipment' asc.pk %}" class="alert-link">Attribuer des équipements</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Tickets de réparation -->
+        <div class="card">
+            <div class="card-header bg-warning d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-tools"></i> Tickets de Réparation ({{ tickets|length }})</h5>
+            </div>
+            <div class="card-body">
+                {% if tickets %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Numéro</th>
+                                <th>Équipement</th>
+                                <th>Statut</th>
+                                <th>Étape</th>
+                                <th>Priorité</th>
+                                <th>Créé le</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ticket in tickets %}
+                            <tr>
+                                <td><strong>{{ ticket.ticket_number }}</strong></td>
+                                <td>
+                                    <small>{{ ticket.equipment.brand }} {{ ticket.equipment.model }}</small>
+                                </td>
+                                <td>
+                                    <span class="badge bg-{% if ticket.status == 'CLOSED' %}success{% elif ticket.status == 'OPEN' %}warning{% else %}primary{% endif %}">
+                                        {{ ticket.get_status_display }}
+                                    </span>
+                                </td>
+                                <td><small>{{ ticket.get_current_stage_display }}</small></td>
+                                <td>
+                                    {% if ticket.priority == 'HIGH' %}
+                                    <span class="badge bg-danger">{{ ticket.get_priority_display }}</span>
+                                    {% elif ticket.priority == 'NORMAL' %}
+                                    <span class="badge bg-info">{{ ticket.get_priority_display }}</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">{{ ticket.get_priority_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td><small>{{ ticket.created_at|date:"d/m/Y" }}</small></td>
+                                <td class="text-end">
+                                    <a href="{% url 'tickets:detail' ticket.pk %}" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-info mb-0">
+                    <i class="bi bi-info-circle"></i> Aucun ticket de réparation pour le moment.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

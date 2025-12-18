@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+
+{% block extra_css %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+{% endblock %}
+
+{% block content %}
+<h1>Créer un Ticket</h1>
+<form method="post" id="ticketForm">
+    {% csrf_token %}
+    <div class="mb-3">
+        <label for="asc_select">ASC <span class="text-danger">*</span></label>
+        <select id="asc_select" name="asc" class="form-control" required>
+            <option value="">-- Sélectionner un ASC --</option>
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="equipment_select">Équipement <span class="text-danger">*</span></label>
+        <select id="equipment_select" name="equipment" class="form-control" required disabled>
+            <option value="">-- Sélectionner d'abord un ASC --</option>
+        </select>
+        <small class="text-muted">Veuillez d'abord sélectionner un ASC</small>
+    </div>
+    <div class="mb-3">
+        <label>Priorité</label>
+        <select name="priority" class="form-control">
+            {% for val, label in priority_choices %}
+            <option value="{{ val }}">{{ label }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="mb-3">
+        <label>Description du problème <span class="text-danger">*</span></label>
+        <textarea name="problem_description" class="form-control" rows="4" required></textarea>
+    </div>
+    <div class="mb-3">
+        <label>Type de problème</label>
+        <div><input type="checkbox" name="issue_type" value="HARDWARE"> Matériel</div>
+        <div><input type="checkbox" name="issue_type" value="SOFTWARE"> Logiciel</div>
+    </div>
+    <button type="submit" class="btn btn-primary">Créer</button>
+    <a href="{% url 'tickets:list' %}" class="btn btn-secondary">Annuler</a>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+$(document).ready(function() {
+    // Initialiser Select2 pour le champ ASC
+    $('#asc_select').select2({
+        theme: 'bootstrap-5',
+        placeholder: '-- Sélectionner un ASC --',
+        allowClear: true,
+        ajax: {
+            url: '/api/ascs/',
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+                return {
+                    search: params.term,
+                    page: params.page || 1
+                };
+            },
+            processResults: function (data) {
+                return {
+                    results: data.results.map(function(asc) {
+                        return {
+                            id: asc.id,
+                            text: asc.first_name + ' ' + asc.last_name + ' (' + asc.code + ')'
+                        };
+                    })
+                };
+            },
+            cache: true
+        }
+    });
+
+    // Initialiser Select2 pour le champ équipement
+    $('#equipment_select').select2({
+        theme: 'bootstrap-5',
+        placeholder: '-- Sélectionner un équipement --',
+        allowClear: true
+    });
+
+    // Charger les équipements quand un ASC est sélectionné
+    $('#asc_select').on('change', function() {
+        const ascId = $(this).val();
+        const equipmentSelect = $('#equipment_select');
+
+        if (ascId) {
+            // Activer le champ équipement et charger les données
+            equipmentSelect.prop('disabled', false);
+            equipmentSelect.empty().append('<option value="">-- Chargement... --</option>');
+
+            // Récupérer les équipements de l'ASC sélectionné
+            $.ajax({
+                url: '/api/equipment/',
+                data: { asc_id: ascId },
+                dataType: 'json',
+                success: function(data) {
+                    equipmentSelect.empty().append('<option value="">-- Sélectionner un équipement --</option>');
+
+                    // Gérer la réponse paginée de DRF ou un tableau direct
+                    const equipments = data.results || data;
+
+                    if (equipments.length === 0) {
+                        equipmentSelect.append('<option value="" disabled>Aucun équipement disponible pour cet ASC</option>');
+                    } else {
+                        equipments.forEach(function(equipment) {
+                            equipmentSelect.append(
+                                $('<option></option>')
+                                    .val(equipment.id)
+                                    .text(equipment.brand + ' ' + equipment.model + ' (' + equipment.imei + ')')
+                            );
+                        });
+                    }
+
+                    // Réinitialiser Select2
+                    equipmentSelect.select2({
+                        theme: 'bootstrap-5',
+                        placeholder: '-- Sélectionner un équipement --',
+                        allowClear: true
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error('Erreur de chargement des équipements:', error);
+                    equipmentSelect.empty().append('<option value="">-- Erreur de chargement --</option>');
+                }
+            });
+        } else {
+            // Désactiver le champ équipement si aucun ASC n'est sélectionné
+            equipmentSelect.prop('disabled', true);
+            equipmentSelect.empty().append('<option value="">-- Sélectionner d\'abord un ASC --</option>');
+            equipmentSelect.select2({
+                theme: 'bootstrap-5',
+                placeholder: '-- Sélectionner d\'abord un ASC --'
+            });
+        }
+    });
+});
+</script>
+{% endblock %}
