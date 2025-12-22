@@ -12,7 +12,8 @@
       "Bash(python manage.py makemigrations assets)",
       "Bash(python manage.py makemigrations tickets)",
       "Bash(cd /home/doctorpy/Integrate\\ Health\\ Dropbox/Djakpo\\ GADO/projets/repair_tracker && python manage.py migrate:*)",
-      "Bash(chmod:*)"
+      "Bash(chmod:*)",
+      "Bash(python manage.py:*)"
     ],
     "deny": [],
     "ask": []

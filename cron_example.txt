@@ -1,0 +1,63 @@
+# ============================================================================
+# Configuration Cron pour Repair Tracker - Alertes de Dépassement de Délai
+# ============================================================================
+#
+# INSTRUCTIONS:
+# 1. Copiez la ligne ci-dessous
+# 2. Éditez votre crontab: crontab -e
+# 3. Collez et adaptez les chemins selon votre installation
+# 4. Sauvegardez et quittez
+#
+# IMPORTANT:
+# - Le serveur doit être en fuseau horaire GMT
+# - Vérifier avec: timedatectl
+# - Changer si nécessaire: sudo timedatectl set-timezone GMT
+#
+# ============================================================================
+
+# Envoi quotidien des alertes à 7h00 GMT
+# Remplacez /chemin/vers/... par vos chemins réels
+0 7 * * * cd /chemin/vers/repair_tracker && /chemin/vers/python manage.py check_delay_alerts >> /var/log/repair_tracker_alerts.log 2>&1
+
+# ============================================================================
+# EXEMPLES DE CONFIGURATION
+# ============================================================================
+
+# Configuration basique (console uniquement, pas de fichier log)
+# 0 7 * * * cd /chemin/vers/repair_tracker && python manage.py check_delay_alerts
+
+# Configuration avec environnement virtuel
+# 0 7 * * * cd /chemin/vers/repair_tracker && /chemin/vers/.venv/bin/python manage.py check_delay_alerts >> /var/log/repair_tracker_alerts.log 2>&1
+
+# Configuration complète avec activation d'environnement
+# 0 7 * * * cd /chemin/vers/repair_tracker && source /chemin/vers/.venv/bin/activate && python manage.py check_delay_alerts >> /var/log/repair_tracker_alerts.log 2>&1
+
+# ============================================================================
+# AUTRES FRÉQUENCES (si besoin)
+# ============================================================================
+
+# Deux fois par jour (7h00 et 14h00)
+# 0 7,14 * * * cd /chemin/vers/repair_tracker && python manage.py check_delay_alerts >> /var/log/repair_tracker_alerts.log 2>&1
+
+# Tous les jours ouvrés uniquement (lundi-vendredi)
+# 0 7 * * 1-5 cd /chemin/vers/repair_tracker && python manage.py check_delay_alerts >> /var/log/repair_tracker_alerts.log 2>&1
+
+# ============================================================================
+# VÉRIFICATION
+# ============================================================================
+# Après avoir ajouté la tâche cron:
+# 1. Lister vos tâches cron: crontab -l
+# 2. Vérifier les logs cron: grep CRON /var/log/syslog
+# 3. Vérifier les logs de l'application: tail -f /var/log/repair_tracker_alerts.log
+# 4. Tester manuellement d'abord: python manage.py check_delay_alerts --dry-run
+
+# ============================================================================
+# EXEMPLE POUR CE PROJET (à adapter)
+# ============================================================================
+# Si vous êtes dans: /home/doctorpy/Integrate Health Dropbox/Djakpo GADO/projets/repair_tracker
+# Et votre environnement virtuel est dans .venv
+# Utilisez:
+
+# 0 7 * * * cd "/home/doctorpy/Integrate Health Dropbox/Djakpo GADO/projets/repair_tracker" && .venv/bin/python manage.py check_delay_alerts >> /var/log/repair_tracker_alerts.log 2>&1
+
+# NOTE: Les espaces dans le chemin nécessitent des guillemets

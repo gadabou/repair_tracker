@@ -12,4 +12,8 @@ urlpatterns = [
     path('<int:pk>/mark-repaired/', views.ticket_mark_repaired, name='mark_repaired'),
     path('<int:pk>/comment/', views.ticket_add_comment, name='add_comment'),
     path('<int:pk>/cancel/', views.ticket_cancel, name='cancel'),
+    # Gestion des alertes
+    path('alerts/config/', views.alert_recipients_config, name='alert_recipients_config'),
+    path('api/search-users/', views.search_users_api, name='search_users_api'),
+    path('api/recipients/<int:pk>/toggle/', views.toggle_recipient_status, name='toggle_recipient_status'),
 ]

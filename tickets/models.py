@@ -380,3 +380,89 @@ class TicketComment(models.Model):
 
     def __str__(self):
         return f"Commentaire sur {self.ticket.ticket_number} par {self.user}"
+
+
+class DelayAlertRecipient(models.Model):
+    """Destinataire des alertes de dépassement de délai"""
+    RECIPIENT_TYPE_CHOICES = [
+        ('PRIMARY', 'Destinataire principal (reçoit en copie)'),
+        ('DEPARTMENT', 'Membre de département (reçoit selon le département)'),
+    ]
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name="Utilisateur"
+    )
+    email = models.EmailField(
+        verbose_name="Email",
+        help_text="Email pour les notifications (modifiable)"
+    )
+    recipient_type = models.CharField(
+        max_length=20,
+        choices=RECIPIENT_TYPE_CHOICES,
+        default='PRIMARY',
+        verbose_name="Type de destinataire",
+        help_text="Principal = toujours en copie, Département = selon département concerné"
+    )
+    is_active = models.BooleanField(
+        default=True,
+        verbose_name="Actif",
+        help_text="Recevoir les notifications"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Destinataire d'alerte"
+        verbose_name_plural = "Destinataires d'alertes"
+        ordering = ['user__last_name', 'user__first_name']
+        unique_together = ['user']
+
+    def __str__(self):
+        return f"{self.user.get_full_name()} - {self.email}"
+
+    def save(self, *args, **kwargs):
+        # Si l'email n'est pas défini, utiliser celui de l'utilisateur
+        if not self.email and self.user.email:
+            self.email = self.user.email
+        super().save(*args, **kwargs)
+
+
+class DelayAlertLog(models.Model):
+    """Journal des alertes envoyées"""
+    ticket = models.ForeignKey(
+        RepairTicket,
+        on_delete=models.CASCADE,
+        related_name='delay_alerts',
+        verbose_name="Ticket"
+    )
+    stage = models.CharField(
+        max_length=30,
+        choices=RepairTicket.STAGE_CHOICES,
+        verbose_name="Étape concernée"
+    )
+    days_in_stage = models.IntegerField(
+        verbose_name="Jours dans l'étape"
+    )
+    recipients = models.TextField(
+        verbose_name="Destinataires",
+        help_text="Liste des emails séparés par des virgules"
+    )
+    sent_at = models.DateTimeField(auto_now_add=True, verbose_name="Envoyé le")
+    email_sent_successfully = models.BooleanField(
+        default=False,
+        verbose_name="Email envoyé avec succès"
+    )
+    error_message = models.TextField(
+        blank=True,
+        verbose_name="Message d'erreur"
+    )
+
+    class Meta:
+        verbose_name = "Journal d'alerte"
+        verbose_name_plural = "Journaux d'alertes"
+        ordering = ['-sent_at']
+
+    def __str__(self):
+        return f"Alerte {self.ticket.ticket_number} - {self.stage} - {self.days_in_stage} jours"

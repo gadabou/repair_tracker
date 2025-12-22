@@ -2,8 +2,11 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
-from .models import RepairTicket, TicketEvent, TicketComment, Issue
+from django.http import JsonResponse
+from django.db import models
+from .models import RepairTicket, TicketEvent, TicketComment, Issue, DelayAlertRecipient, DelayAlertLog
 from assets.models import Equipment
+from accounts.models import User
 
 
 @login_required
@@ -317,3 +320,95 @@ def ticket_cancel(request, pk):
 
     context = {'ticket': ticket}
     return render(request, 'tickets/cancel.html', context)
+
+
+@login_required
+def alert_recipients_config(request):
+    """Configuration des destinataires d'alertes de dépassement de délai"""
+    # Vérifier que l'utilisateur est administrateur
+    if not request.user.is_staff and not request.user.is_admin_role():
+        messages.error(request, "Vous n'avez pas les droits nécessaires pour accéder à cette page.")
+        return redirect('dashboard:home')
+
+    if request.method == 'POST':
+        # Récupérer les utilisateurs sélectionnés
+        user_ids = request.POST.getlist('users')
+
+        # Supprimer les anciens destinataires
+        DelayAlertRecipient.objects.all().delete()
+
+        # Créer les nouveaux destinataires
+        for user_id in user_ids:
+            try:
+                user = User.objects.get(pk=user_id)
+                email = request.POST.get(f'email_{user_id}', user.email)
+                recipient_type = request.POST.get(f'type_{user_id}', 'PRIMARY')
+
+                DelayAlertRecipient.objects.create(
+                    user=user,
+                    email=email,
+                    recipient_type=recipient_type,
+                    is_active=True
+                )
+            except User.DoesNotExist:
+                continue
+
+        messages.success(request, 'Configuration des destinataires mise à jour avec succès!')
+        return redirect('tickets:alert_recipients_config')
+
+    # Récupérer les destinataires actuels
+    current_recipients = DelayAlertRecipient.objects.all().select_related('user')
+
+    # Récupérer tous les utilisateurs pour la sélection
+    all_users = User.objects.filter(is_active=True).order_by('last_name', 'first_name')
+
+    # Récupérer l'historique des alertes
+    recent_alerts = DelayAlertLog.objects.select_related('ticket').order_by('-sent_at')[:20]
+
+    context = {
+        'current_recipients': current_recipients,
+        'all_users': all_users,
+        'recent_alerts': recent_alerts,
+    }
+    return render(request, 'tickets/alert_recipients_config.html', context)
+
+
+@login_required
+def search_users_api(request):
+    """API pour la recherche d'utilisateurs (autocomplétion)"""
+    query = request.GET.get('q', '')
+
+    if len(query) < 2:
+        return JsonResponse({'results': []})
+
+    users = User.objects.filter(
+        is_active=True
+    ).filter(
+        models.Q(first_name__icontains=query) |
+        models.Q(last_name__icontains=query) |
+        models.Q(email__icontains=query)
+    ).order_by('last_name', 'first_name')[:10]
+
+    results = [{
+        'id': user.id,
+        'text': f"{user.get_full_name()} ({user.get_role_display()})",
+        'email': user.email or ''
+    } for user in users]
+
+    return JsonResponse({'results': results})
+
+
+@login_required
+def toggle_recipient_status(request, pk):
+    """Activer/désactiver un destinataire d'alertes"""
+    if not request.user.is_staff and not request.user.is_admin_role():
+        return JsonResponse({'error': 'Permission refusée'}, status=403)
+
+    recipient = get_object_or_404(DelayAlertRecipient, pk=pk)
+    recipient.is_active = not recipient.is_active
+    recipient.save()
+
+    return JsonResponse({
+        'success': True,
+        'is_active': recipient.is_active
+    })

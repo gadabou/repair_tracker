@@ -1,0 +1,319 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Configuration des alertes de dépassement - Repair Tracker{% endblock %}
+
+{% block extra_css %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+<style>
+    .recipient-card {
+        transition: all 0.3s;
+    }
+    .recipient-card:hover {
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+    .email-preview {
+        background-color: #f8f9fa;
+        padding: 0.5rem;
+        border-radius: 0.25rem;
+        font-size: 0.9rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2><i class="bi bi-bell"></i> Configuration des alertes de dépassement</h2>
+                <p class="text-muted">Gérez les destinataires des notifications lorsqu'un téléphone dépasse 2 semaines dans une étape</p>
+            </div>
+            <a href="{% url 'tickets:list' %}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Retour
+            </a>
+        </div>
+
+        <!-- Carte d'information -->
+        <div class="alert alert-info" role="alert">
+            <i class="bi bi-info-circle"></i>
+            <strong>Fonctionnement :</strong> Lorsqu'un téléphone reste plus de 14 jours dans un département ou chez le réparateur,
+            un email est automatiquement envoyé aux personnes configurées ci-dessous.
+        </div>
+
+        <!-- Formulaire de configuration -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-person-plus"></i> Sélectionner les destinataires</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" id="recipientsForm">
+                    {% csrf_token %}
+
+                    <div class="mb-4">
+                        <label for="userSelect" class="form-label">
+                            <strong>Personnes à notifier</strong>
+                            <small class="text-muted">(Sélection multiple avec recherche)</small>
+                        </label>
+                        <select id="userSelect" name="users" class="form-select" multiple="multiple">
+                            {% for recipient in current_recipients %}
+                            <option value="{{ recipient.user.id }}" selected
+                                data-email="{{ recipient.email }}">
+                                {{ recipient.user.get_full_name }} ({{ recipient.user.get_role_display }})
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <small class="form-text text-muted">
+                            Tapez pour rechercher par nom ou rôle. Vous pouvez sélectionner plusieurs personnes.
+                        </small>
+                    </div>
+
+                    <!-- Aperçu des emails -->
+                    <div id="emailPreview" class="mb-4">
+                        <h6><i class="bi bi-envelope"></i> Emails des destinataires sélectionnés</h6>
+                        <div id="emailList" class="row g-3">
+                            {% for recipient in current_recipients %}
+                            <div class="col-md-6" data-user-id="{{ recipient.user.id }}">
+                                <div class="card recipient-card">
+                                    <div class="card-body">
+                                        <h6 class="card-title">{{ recipient.user.get_full_name }}</h6>
+                                        <small class="text-muted">{{ recipient.user.get_role_display }}</small>
+                                        <div class="mt-2">
+                                            <label class="form-label small">Email de notification :</label>
+                                            <input type="email"
+                                                   name="email_{{ recipient.user.id }}"
+                                                   class="form-control form-control-sm"
+                                                   value="{{ recipient.email }}"
+                                                   required>
+                                        </div>
+                                        <div class="mt-2">
+                                            <label class="form-label small">Type de destinataire :</label>
+                                            <select name="type_{{ recipient.user.id }}" class="form-select form-select-sm">
+                                                <option value="PRIMARY" {% if recipient.recipient_type == 'PRIMARY' %}selected{% endif %}>
+                                                    📧 Principal (reçoit tous les emails en copie)
+                                                </option>
+                                                <option value="DEPARTMENT" {% if recipient.recipient_type == 'DEPARTMENT' %}selected{% endif %}>
+                                                    🎯 Département (reçoit selon son département)
+                                                </option>
+                                            </select>
+                                            <small class="text-muted">
+                                                Principal = toujours en CC | Département = destinataire direct si son rôle correspond
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <button type="button" class="btn btn-outline-secondary" onclick="window.location.href='{% url 'tickets:list' %}'">
+                            <i class="bi bi-x-circle"></i> Annuler
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save"></i> Enregistrer la configuration
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Destinataires actuels -->
+        {% if current_recipients %}
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="bi bi-check-circle"></i> Destinataires actifs ({{ current_recipients.count }})</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Rôle</th>
+                                <th>Email de notification</th>
+                                <th>Date d'ajout</th>
+                                <th>Statut</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for recipient in current_recipients %}
+                            <tr>
+                                <td>{{ recipient.user.get_full_name }}</td>
+                                <td><span class="badge bg-info">{{ recipient.user.get_role_display }}</span></td>
+                                <td><code>{{ recipient.email }}</code></td>
+                                <td>{{ recipient.created_at|date:"d/m/Y H:i" }}</td>
+                                <td>
+                                    {% if recipient.is_active %}
+                                    <span class="badge bg-success">Actif</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">Inactif</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Historique des alertes -->
+        {% if recent_alerts %}
+        <div class="card shadow-sm">
+            <div class="card-header bg-warning">
+                <h5 class="mb-0"><i class="bi bi-clock-history"></i> Historique des alertes récentes</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Ticket</th>
+                                <th>Étape</th>
+                                <th>Jours</th>
+                                <th>Statut envoi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for alert in recent_alerts %}
+                            <tr>
+                                <td>{{ alert.sent_at|date:"d/m/Y H:i" }}</td>
+                                <td>
+                                    <a href="{% url 'tickets:detail' alert.ticket.pk %}">
+                                        {{ alert.ticket.ticket_number }}
+                                    </a>
+                                </td>
+                                <td><span class="badge bg-secondary">{{ alert.get_stage_display }}</span></td>
+                                <td>
+                                    <span class="badge bg-danger">{{ alert.days_in_stage }} jours</span>
+                                </td>
+                                <td>
+                                    {% if alert.email_sent_successfully %}
+                                    <i class="bi bi-check-circle-fill text-success"></i> Envoyé
+                                    {% else %}
+                                    <i class="bi bi-x-circle-fill text-danger"></i> Échec
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+$(document).ready(function() {
+    // Initialiser Select2 avec recherche Ajax
+    $('#userSelect').select2({
+        theme: 'bootstrap-5',
+        placeholder: 'Rechercher et sélectionner des utilisateurs...',
+        allowClear: true,
+        ajax: {
+            url: '{% url "tickets:search_users_api" %}',
+            dataType: 'json',
+            delay: 250,
+            data: function(params) {
+                return {
+                    q: params.term
+                };
+            },
+            processResults: function(data) {
+                return {
+                    results: data.results
+                };
+            },
+            cache: true
+        },
+        minimumInputLength: 2
+    });
+
+    // Gérer le changement de sélection
+    $('#userSelect').on('change', function() {
+        updateEmailPreview();
+    });
+
+    function updateEmailPreview() {
+        const selectedUsers = $('#userSelect').select2('data');
+        const emailList = $('#emailList');
+        emailList.empty();
+
+        selectedUsers.forEach(function(user) {
+            const email = user.email || '';
+            const card = `
+                <div class="col-md-6" data-user-id="${user.id}">
+                    <div class="card recipient-card">
+                        <div class="card-body">
+                            <h6 class="card-title">${user.text.split('(')[0].trim()}</h6>
+                            <small class="text-muted">${user.text.match(/\((.*?)\)/)[1]}</small>
+                            <div class="mt-2">
+                                <label class="form-label small">Email de notification :</label>
+                                <input type="email"
+                                       name="email_${user.id}"
+                                       class="form-control form-control-sm"
+                                       value="${email}"
+                                       placeholder="email@example.com"
+                                       required>
+                            </div>
+                            <div class="mt-2">
+                                <label class="form-label small">Type de destinataire :</label>
+                                <select name="type_${user.id}" class="form-select form-select-sm">
+                                    <option value="PRIMARY">📧 Principal (reçoit tous les emails en copie)</option>
+                                    <option value="DEPARTMENT">🎯 Département (reçoit selon son département)</option>
+                                </select>
+                                <small class="text-muted">
+                                    Principal = toujours en CC | Département = destinataire direct si son rôle correspond
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            emailList.append(card);
+        });
+
+        if (selectedUsers.length === 0) {
+            emailList.html('<div class="col-12"><p class="text-muted text-center">Aucun destinataire sélectionné</p></div>');
+        }
+    }
+
+    // Validation du formulaire
+    $('#recipientsForm').on('submit', function(e) {
+        const selectedUsers = $('#userSelect').val();
+        if (!selectedUsers || selectedUsers.length === 0) {
+            e.preventDefault();
+            alert('Veuillez sélectionner au moins un destinataire.');
+            return false;
+        }
+
+        // Vérifier que tous les emails sont remplis
+        let allEmailsFilled = true;
+        $('input[type="email"]').each(function() {
+            if ($(this).val().trim() === '') {
+                allEmailsFilled = false;
+                $(this).addClass('is-invalid');
+            } else {
+                $(this).removeClass('is-invalid');
+            }
+        });
+
+        if (!allEmailsFilled) {
+            e.preventDefault();
+            alert('Veuillez remplir tous les emails de notification.');
+            return false;
+        }
+    });
+});
+</script>
+{% endblock %}
