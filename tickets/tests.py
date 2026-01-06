@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.utils import timezone
 from accounts.models import User, ASC
-from locations.models import Region, District, Commune, FormationSanitaire
+from locations.models import Region, District, Site
 from assets.models import Equipment
 from .models import RepairTicket, Issue, TicketEvent
 
@@ -12,11 +12,10 @@ class RepairTicketModelTest(TestCase):
         # Créer la hiérarchie géographique
         region = Region.objects.create(name='Test Region', code='TR')
         district = District.objects.create(region=region, name='Test District', code='TD')
-        commune = Commune.objects.create(district=district, name='Test Commune', code='TC')
-        fs = FormationSanitaire.objects.create(
-            commune=commune,
-            name='Test FS',
-            code='TFS'
+        site = Site.objects.create(
+            district=district,
+            name='Test Site',
+            code='TS'
         )
 
         # Créer un superviseur
@@ -24,7 +23,7 @@ class RepairTicketModelTest(TestCase):
             username='testsupervisor',
             password='testpass',
             role='SUPERVISOR',
-            formation_sanitaire=fs
+            site=site
         )
 
         # Créer un ASC
@@ -33,7 +32,7 @@ class RepairTicketModelTest(TestCase):
             last_name='ASC',
             code='ASC-TEST',
             phone='97000000',
-            formation_sanitaire=fs,
+            site=site,
             supervisor=self.supervisor
         )
 
@@ -96,14 +95,13 @@ class TicketEventModelTest(TestCase):
         """Créer des données de test"""
         region = Region.objects.create(name='Test Region', code='TR')
         district = District.objects.create(region=region, name='Test District', code='TD')
-        commune = Commune.objects.create(district=district, name='Test Commune', code='TC')
-        fs = FormationSanitaire.objects.create(commune=commune, name='Test FS', code='TFS')
+        site = Site.objects.create(district=district, name='Test Site', code='TS')
 
         self.supervisor = User.objects.create_user(
             username='testsupervisor',
             password='testpass',
             role='SUPERVISOR',
-            formation_sanitaire=fs
+            site=site
         )
 
         self.asc = ASC.objects.create(
@@ -111,7 +109,7 @@ class TicketEventModelTest(TestCase):
             last_name='ASC',
             code='ASC-TEST',
             phone='97000000',
-            formation_sanitaire=fs,
+            site=site,
             supervisor=self.supervisor
         )
 

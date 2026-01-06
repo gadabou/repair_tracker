@@ -82,10 +82,10 @@
                                 Site <span class="text-danger">*</span>
                             </label>
                             <select class="form-select" id="site" name="site" required>
-                                <option value="">-- Sélectionner une formation sanitaire --</option>
+                                <option value="">-- Sélectionner un site --</option>
                                 {% for fs in sites %}
                                 <option value="{{ fs.id }}">
-                                    {{ fs.name }} - {{ fs.commune.name }} ({{ fs.commune.district.name }})
+                                    {{ fs.name }} - {{ fs.district.name }} ({{ fs.district.region.name }})
                                 </option>
                                 {% endfor %}
                             </select>

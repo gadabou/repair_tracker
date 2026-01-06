@@ -23,8 +23,8 @@ class ASCAdmin(admin.ModelAdmin):
     list_display = ['code', 'first_name', 'last_name', 'phone', 'site', 'supervisor', 'is_active']
     list_filter = [
         'is_active',
-        'site__commune__district__region',
-        'site__commune__district',
+        'site__district__region',
+        'site__district',
         'site'
     ]
     search_fields = ['code', 'first_name', 'last_name', 'phone', 'email']

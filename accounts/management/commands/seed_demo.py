@@ -4,7 +4,7 @@ from datetime import timedelta
 import random
 
 from accounts.models import User, ASC
-from locations.models import Region, District, Commune, FormationSanitaire, ZoneASC
+from locations.models import Region, District, Site, ZoneASC
 from assets.models import Equipment
 from tickets.models import RepairTicket, Issue, TicketEvent
 
@@ -22,8 +22,7 @@ class Command(BaseCommand):
         ASC.objects.all().delete()
         User.objects.filter(is_superuser=False).delete()
         ZoneASC.objects.all().delete()
-        FormationSanitaire.objects.all().delete()
-        Commune.objects.all().delete()
+        Site.objects.all().delete()
         District.objects.all().delete()
         Region.objects.all().delete()
 
@@ -39,29 +38,23 @@ class Command(BaseCommand):
         ouidah = District.objects.create(region=atlantique, name='Ouidah', code='OUI')
         parakou = District.objects.create(region=borgou, name='Parakou', code='PAR')
 
-        # Créer les communes
-        self.stdout.write('Création des communes...')
-        tanguieta = Commune.objects.create(district=natitingou, name='Tanguiéta', code='TGT')
-        ouidah_commune = Commune.objects.create(district=ouidah, name='Ouidah', code='OUI')
-        parakou_commune = Commune.objects.create(district=parakou, name='Parakou', code='PAR')
-
-        # Créer les formations sanitaires
-        self.stdout.write('Création des formations sanitaires...')
-        fs1 = FormationSanitaire.objects.create(
-            commune=tanguieta,
+        # Créer les sites
+        self.stdout.write('Création des sites...')
+        site1 = Site.objects.create(
+            district=natitingou,
             name='CS Tanguiéta Centre',
             code='TGT-CS-01',
             phone='97123456',
             address='Route Nationale 1'
         )
-        fs2 = FormationSanitaire.objects.create(
-            commune=ouidah_commune,
+        site2 = Site.objects.create(
+            district=ouidah,
             name='CS Ouidah Zone 1',
             code='OUI-CS-01',
             phone='97234567'
         )
-        fs3 = FormationSanitaire.objects.create(
-            commune=parakou_commune,
+        site3 = Site.objects.create(
+            district=parakou,
             name='CS Parakou Centre',
             code='PAR-CS-01',
             phone='97345678'
@@ -70,10 +63,10 @@ class Command(BaseCommand):
         # Créer les zones ASC
         self.stdout.write('Création des zones ASC...')
         zones = [
-            ZoneASC.objects.create(formation_sanitaire=fs1, name='Zone A', code='ZA', population=1500),
-            ZoneASC.objects.create(formation_sanitaire=fs1, name='Zone B', code='ZB', population=2000),
-            ZoneASC.objects.create(formation_sanitaire=fs2, name='Zone 1', code='Z1', population=1800),
-            ZoneASC.objects.create(formation_sanitaire=fs3, name='Zone Centre', code='ZC', population=2200),
+            ZoneASC.objects.create(site=site1, name='Zone A', code='ZA'),
+            ZoneASC.objects.create(site=site1, name='Zone B', code='ZB'),
+            ZoneASC.objects.create(site=site2, name='Zone 1', code='Z1'),
+            ZoneASC.objects.create(site=site3, name='Zone Centre', code='ZC'),
         ]
 
         # Créer les utilisateurs avec différents rôles
@@ -103,7 +96,7 @@ class Command(BaseCommand):
             email='superviseur1@example.com',
             role='SUPERVISOR',
             phone='97111111',
-            formation_sanitaire=fs1
+            site=site1
         )
 
         superviseur2 = User.objects.create_user(
@@ -114,7 +107,7 @@ class Command(BaseCommand):
             email='superviseur2@example.com',
             role='SUPERVISOR',
             phone='97222222',
-            formation_sanitaire=fs2
+            site=site2
         )
 
         # Programme
@@ -175,10 +168,10 @@ class Command(BaseCommand):
             ('Estelle', 'Gbèmisola', 'F'),
         ]
 
-        formations = [fs1, fs1, fs2, fs2, fs3, fs3, fs1, fs2]
+        sites = [site1, site1, site2, site2, site3, site3, site1, site2]
         superviseurs = [superviseur1, superviseur1, superviseur2, superviseur2, superviseur1, superviseur1, superviseur1, superviseur2]
 
-        for i, ((first_name, last_name, gender), fs, sup) in enumerate(zip(asc_names, formations, superviseurs)):
+        for i, ((first_name, last_name, gender), site, sup) in enumerate(zip(asc_names, sites, superviseurs)):
             asc = ASC.objects.create(
                 first_name=first_name,
                 last_name=last_name,
@@ -186,7 +179,7 @@ class Command(BaseCommand):
                 gender=gender,
                 phone=f'9770{i+1:04d}',
                 email=f'{first_name.lower()}.{last_name.lower()}@asc.local',
-                formation_sanitaire=fs,
+                site=site,
                 zone_asc=zones[i % len(zones)],
                 supervisor=sup,
                 is_active=True
@@ -291,8 +284,7 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS('Données de démonstration créées avec succès!'))
         self.stdout.write(self.style.SUCCESS(f'- {Region.objects.count()} régions'))
         self.stdout.write(self.style.SUCCESS(f'- {District.objects.count()} districts'))
-        self.stdout.write(self.style.SUCCESS(f'- {Commune.objects.count()} communes'))
-        self.stdout.write(self.style.SUCCESS(f'- {FormationSanitaire.objects.count()} formations sanitaires'))
+        self.stdout.write(self.style.SUCCESS(f'- {Site.objects.count()} sites'))
         self.stdout.write(self.style.SUCCESS(f'- {ZoneASC.objects.count()} zones ASC'))
         self.stdout.write(self.style.SUCCESS(f'- {User.objects.count()} utilisateurs'))
         self.stdout.write(self.style.SUCCESS(f'- {ASC.objects.count()} ASCs'))

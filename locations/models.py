@@ -35,27 +35,9 @@ class District(models.Model):
         return f"{self.name} ({self.region.name})"
 
 
-class Commune(models.Model):
-    """Commune"""
-    district = models.ForeignKey(District, on_delete=models.CASCADE, related_name='communes')
-    name = models.CharField(max_length=100, verbose_name="Nom")
-    code = models.CharField(max_length=20, verbose_name="Code")
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        verbose_name = "Commune"
-        verbose_name_plural = "Communes"
-        ordering = ['district', 'name']
-        unique_together = ['district', 'code']
-
-    def __str__(self):
-        return f"{self.name} ({self.district.name})"
-
-
 class Site(models.Model):
     """Site (Centre de santé)"""
-    commune = models.ForeignKey(Commune, on_delete=models.CASCADE, related_name='sites')
+    district = models.ForeignKey(District, on_delete=models.CASCADE, related_name='sites')
     name = models.CharField(max_length=150, verbose_name="Nom")
     code = models.CharField(max_length=20, unique=True, verbose_name="Code")
     address = models.TextField(blank=True, verbose_name="Adresse")
@@ -66,18 +48,14 @@ class Site(models.Model):
     class Meta:
         verbose_name = "Site"
         verbose_name_plural = "Sites"
-        ordering = ['commune', 'name']
+        ordering = ['district', 'name']
 
     def __str__(self):
-        return f"{self.name} ({self.commune.name})"
-
-    @property
-    def district(self):
-        return self.commune.district
+        return f"{self.name} ({self.district.name})"
 
     @property
     def region(self):
-        return self.commune.district.region
+        return self.district.region
 
 
 class ZoneASC(models.Model):
