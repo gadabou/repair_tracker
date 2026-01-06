@@ -24,15 +24,6 @@
                     <div class="col-md-6">
                         <p><strong>Équipement:</strong><br>{{ ticket.equipment }}</p>
                         <p><strong>ASC Propriétaire:</strong><br>{{ ticket.asc.get_full_name }} ({{ ticket.asc.code }})</p>
-                        <p><strong>Priorité:</strong><br>
-                            {% if ticket.priority == 'LOW' %}
-                                <span class="badge bg-secondary">{{ ticket.get_priority_display }}</span>
-                            {% elif ticket.priority == 'NORMAL' %}
-                                <span class="badge bg-info">{{ ticket.get_priority_display }}</span>
-                            {% else %}
-                                <span class="badge bg-danger">{{ ticket.get_priority_display }}</span>
-                            {% endif %}
-                        </p>
                     </div>
                     <div class="col-md-6">
                         <p><strong>Statut:</strong><br>

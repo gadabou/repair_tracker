@@ -148,7 +148,7 @@ show_connection_info() {
     print_info "🗄️  Base de données PostgreSQL:"
     echo "   Host: localhost:5432"
     echo "   Database: repair_tracker"
-    echo "   User: repair_user"
+    echo "   User: admin"
     echo "   Password: repair_password_2024"
     echo ""
     print_info "📋 Commandes utiles:"

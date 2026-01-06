@@ -58,7 +58,6 @@ def ticket_create(request):
         equipment_id = request.POST.get('equipment')
         asc_id = request.POST.get('asc')
         problem_description = request.POST.get('problem_description')
-        priority = request.POST.get('priority', 'NORMAL')
 
         equipment = get_object_or_404(Equipment, pk=equipment_id)
 
@@ -72,7 +71,6 @@ def ticket_create(request):
         ticket = RepairTicket.objects.create(
             equipment=equipment,
             asc=asc,
-            priority=priority,
             created_by=request.user,
             initial_problem_description=problem_description,
             current_stage='SUPERVISOR',
@@ -80,13 +78,16 @@ def ticket_create(request):
         )
 
         # Créer les issues
-        issue_types = request.POST.getlist('issue_type')
-        for issue_type in issue_types:
-            Issue.objects.create(
-                ticket=ticket,
-                issue_type=issue_type,
-                description=f"Problème de type {issue_type}"
-            )
+        issue_types = request.POST.getlist('issue_types')
+        issue_description = request.POST.get('issue_description', '')
+
+        if issue_types:
+            for issue_type in issue_types:
+                Issue.objects.create(
+                    ticket=ticket,
+                    issue_type=issue_type,
+                    description=issue_description
+                )
 
         # Créer l'événement de création
         TicketEvent.objects.create(
@@ -107,7 +108,7 @@ def ticket_create(request):
     equipments = Equipment.objects.filter(status__in=['FAULTY', 'FUNCTIONAL']).select_related('owner')
     context = {
         'equipments': equipments,
-        'priority_choices': RepairTicket.PRIORITY_CHOICES,
+        'issue_choices': Issue.ISSUE_TYPE_CHOICES,
     }
     return render(request, 'tickets/create.html', context)
 

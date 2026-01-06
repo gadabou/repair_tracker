@@ -1,4 +1,4 @@
-version: '3.8'
+#version: '3.8'
 
 services:
   db:
@@ -8,12 +8,12 @@ services:
       - postgres_data:/var/lib/postgresql/data
     environment:
       - POSTGRES_DB=repair_tracker
-      - POSTGRES_USER=repair_user
-      - POSTGRES_PASSWORD=repair_password_2024
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=P@$$W0rd2025
     ports:
-      - "5432:5432"
+      - "5333:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U repair_user -d repair_tracker"]
+      test: ["CMD-SHELL", "pg_isready -U admin -d repair_tracker"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -28,11 +28,11 @@ services:
       - static_volume:/app/staticfiles
       - media_volume:/app/media
     ports:
-      - "8000:8000"
+      - "8088:8000"
     environment:
       - DEBUG=False
-      - SECRET_KEY=django-insecure-change-this-in-production-xyz123
-      - DATABASE_URL=postgresql://repair_user:repair_password_2024@db:5432/repair_tracker
+      - SECRET_KEY=npck&e0hxnb6*nml^plrf30_ri(5a!vp-v-7&ktckpos-t0zwl
+      - DATABASE_URL=postgresql://admin:P@$$W0rd2025@db:5432/repair_tracker
       - ALLOWED_HOSTS=localhost,127.0.0.1,0.0.0.0
       - DJANGO_SETTINGS_MODULE=config.settings
     depends_on:
@@ -44,7 +44,7 @@ services:
     image: nginx:alpine
     container_name: repair_tracker_nginx
     ports:
-      - "80:80"
+      - "88:80"
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - static_volume:/app/staticfiles:ro

@@ -54,7 +54,6 @@
                         <th>ASC</th>
                         <th>Statut</th>
                         <th>Étape</th>
-                        <th>Priorité</th>
                         <th>Délai</th>
                         <th>Date création</th>
                         <th></th>
@@ -72,7 +71,6 @@
                             </span>
                         </td>
                         <td><span class="badge bg-secondary">{{ ticket.get_current_stage_display }}</span></td>
-                        <td><span class="badge bg-warning">{{ ticket.get_priority_display }}</span></td>
                         <td><span class="badge bg-{{ ticket.get_delay_color }}">{{ ticket.get_delay_days }} jours</span></td>
                         <td>{{ ticket.created_at|date:"d/m/Y H:i" }}</td>
                         <td>
@@ -91,7 +89,7 @@
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="9" class="text-center text-muted">Aucun ticket trouvé</td>
+                        <td colspan="8" class="text-center text-muted">Aucun ticket trouvé</td>
                     </tr>
                     {% endfor %}
                 </tbody>

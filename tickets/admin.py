@@ -22,8 +22,8 @@ class TicketCommentInline(admin.StackedInline):
 
 @admin.register(RepairTicket)
 class RepairTicketAdmin(admin.ModelAdmin):
-    list_display = ['ticket_number', 'equipment', 'asc', 'status', 'current_stage', 'priority', 'get_delay_days', 'created_at']
-    list_filter = ['status', 'priority', 'current_stage', 'created_at']
+    list_display = ['ticket_number', 'equipment', 'asc', 'status', 'current_stage', 'get_delay_days', 'created_at']
+    list_filter = ['status', 'current_stage', 'created_at']
     search_fields = ['ticket_number', 'equipment__imei', 'asc__first_name', 'asc__last_name']
     ordering = ['-created_at']
     readonly_fields = ['ticket_number', 'created_at', 'updated_at', 'get_delay_days']
@@ -34,8 +34,8 @@ class RepairTicketAdmin(admin.ModelAdmin):
         ('Informations du ticket', {
             'fields': ('ticket_number', 'equipment', 'asc', 'created_by')
         }),
-        ('Statut et Priorité', {
-            'fields': ('status', 'priority', 'current_stage', 'current_holder')
+        ('Statut', {
+            'fields': ('status', 'current_stage', 'current_holder')
         }),
         ('Dates', {
             'fields': ('initial_send_date', 'repair_completed_date', 'closed_date', 'created_at', 'updated_at')

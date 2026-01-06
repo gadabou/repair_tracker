@@ -29,6 +29,13 @@ DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
+# CSRF Configuration for Docker/Nginx
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:88',
+    'http://127.0.0.1:88',
+    'http://localhost:8088',
+    'http://127.0.0.1:8088',
+]
 
 # Application definition
 

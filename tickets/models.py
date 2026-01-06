@@ -16,12 +16,6 @@ class RepairTicket(models.Model):
         ('CANCELLED', 'Annulé'),
     ]
 
-    PRIORITY_CHOICES = [
-        ('LOW', 'Basse'),
-        ('NORMAL', 'Normale'),
-        ('HIGH', 'Haute'),
-    ]
-
     STAGE_CHOICES = [
         ('SUPERVISOR', 'Superviseur'),
         ('PROGRAM', 'Programme'),
@@ -55,18 +49,12 @@ class RepairTicket(models.Model):
         verbose_name="ASC propriétaire"
     )
 
-    # Statut et priorité
+    # Statut
     status = models.CharField(
         max_length=20,
         choices=STATUS_CHOICES,
         default='OPEN',
         verbose_name="Statut"
-    )
-    priority = models.CharField(
-        max_length=20,
-        choices=PRIORITY_CHOICES,
-        default='NORMAL',
-        verbose_name="Priorité"
     )
 
     # Workflow tracking
@@ -262,9 +250,31 @@ class RepairTicket(models.Model):
 class Issue(models.Model):
     """Problème signalé sur un ticket"""
     ISSUE_TYPE_CHOICES = [
-        ('HARDWARE', 'Matériel'),
-        ('SOFTWARE', 'Logiciel'),
-        ('OTHER', 'Autre'),
+        # Problèmes matériels
+        ('SCREEN_BROKEN', 'Écran cassé'),
+        ('SCREEN_NOT_WORKING', 'Écran ne fonctionne pas'),
+        ('BATTERY_ISSUE', 'Problème de batterie'),
+        ('CHARGING_ISSUE', 'Problème de charge'),
+        ('BUTTON_ISSUE', 'Bouton(s) défectueux'),
+        ('CAMERA_ISSUE', 'Problème de caméra'),
+        ('MICROPHONE_ISSUE', 'Problème de microphone'),
+        ('SPEAKER_ISSUE', 'Problème de haut-parleur'),
+        ('NETWORK_ISSUE', 'Problème de réseau'),
+        ('WIFI_ISSUE', 'Problème WiFi'),
+        ('BLUETOOTH_ISSUE', 'Problème Bluetooth'),
+        ('WATER_DAMAGE', 'Dégât des eaux'),
+        ('PHYSICAL_DAMAGE', 'Dommage physique'),
+
+        # Problèmes logiciels
+        ('SOFTWARE_CRASH', 'Application plante'),
+        ('SLOW_PERFORMANCE', 'Performance lente'),
+        ('SYSTEM_UPDATE', 'Mise à jour système nécessaire'),
+        ('APP_NOT_WORKING', 'Application ne fonctionne pas'),
+        ('DATA_LOSS', 'Perte de données'),
+        ('VIRUS_MALWARE', 'Virus/Malware'),
+
+        # Autres
+        ('OTHER', 'Autre problème'),
     ]
 
     ticket = models.ForeignKey(
@@ -274,11 +284,11 @@ class Issue(models.Model):
         verbose_name="Ticket"
     )
     issue_type = models.CharField(
-        max_length=20,
+        max_length=30,
         choices=ISSUE_TYPE_CHOICES,
         verbose_name="Type de problème"
     )
-    description = models.TextField(verbose_name="Description")
+    description = models.TextField(blank=True, verbose_name="Description additionnelle")
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
