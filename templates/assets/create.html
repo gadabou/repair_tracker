@@ -97,7 +97,7 @@
                                 <option value="">-- Non attribué (optionnel) --</option>
                                 {% for asc in ascs %}
                                 <option value="{{ asc.id }}">
-                                    {{ asc.get_full_name }} ({{ asc.code }}) - {{ asc.formation_sanitaire }}
+                                    {{ asc.get_full_name }} ({{ asc.code }}) - {{ asc.site }}
                                 </option>
                                 {% endfor %}
                             </select>

@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from locations.models import FormationSanitaire, ZoneASC
+from locations.models import Site, ZoneASC
 
 
 class User(AbstractUser):
@@ -16,13 +16,13 @@ class User(AbstractUser):
 
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, verbose_name="Rôle")
     phone = models.CharField(max_length=20, blank=True, verbose_name="Téléphone")
-    formation_sanitaire = models.ForeignKey(
-        FormationSanitaire,
+    site = models.ForeignKey(
+        Site,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
         related_name='users',
-        verbose_name="Formation Sanitaire"
+        verbose_name="Site"
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -84,11 +84,11 @@ class ASC(models.Model):
     email = models.EmailField(blank=True, verbose_name="Email")
 
     # Localisation
-    formation_sanitaire = models.ForeignKey(
-        FormationSanitaire,
+    site = models.ForeignKey(
+        Site,
         on_delete=models.CASCADE,
         related_name='ascs',
-        verbose_name="Formation Sanitaire"
+        verbose_name="Site"
     )
     zone_asc = models.ForeignKey(
         ZoneASC,
@@ -125,19 +125,19 @@ class ASC(models.Model):
         ordering = ['last_name', 'first_name']
 
     def __str__(self):
-        return f"{self.first_name} {self.last_name} ({self.code} {self.formation_sanitaire})"
+        return f"{self.first_name} {self.last_name} ({self.code} {self.site})"
 
     def get_full_name(self):
         return f"{self.first_name} {self.last_name}"
 
     @property
     def commune(self):
-        return self.formation_sanitaire.commune
+        return self.site.commune
 
     @property
     def district(self):
-        return self.formation_sanitaire.district
+        return self.site.district
 
     @property
     def region(self):
-        return self.formation_sanitaire.region
+        return self.site.region

@@ -98,7 +98,7 @@ def equipment_create(request):
         return redirect('assets:detail', pk=equipment.pk)
 
     # GET - Afficher le formulaire
-    ascs = ASC.objects.filter(is_active=True).select_related('formation_sanitaire')
+    ascs = ASC.objects.filter(is_active=True).select_related('site')
 
     context = {
         'equipment_types': Equipment.TYPE_CHOICES,
@@ -140,7 +140,7 @@ def equipment_assign(request, pk):
         else:
             messages.error(request, 'Veuillez sélectionner un ASC.')
 
-    ascs = ASC.objects.filter(is_active=True).select_related('formation_sanitaire')
+    ascs = ASC.objects.filter(is_active=True).select_related('site')
     context = {
         'equipment': equipment,
         'ascs': ascs,

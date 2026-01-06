@@ -95,7 +95,7 @@ class Migration(migrations.Migration):
                 ('population', models.IntegerField(blank=True, null=True, verbose_name='Population estimée')),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
-                ('formation_sanitaire', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='zones_asc', to='locations.formationsanitaire')),
+                ('formation_sanitaire', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='zones_asc', to='locations.site')),
             ],
             options={
                 'verbose_name': 'Zone ASC',

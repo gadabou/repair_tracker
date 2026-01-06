@@ -11,21 +11,21 @@ class UserAdmin(BaseUserAdmin):
     ordering = ['username']
 
     fieldsets = BaseUserAdmin.fieldsets + (
-        ('Informations supplémentaires', {'fields': ('role', 'phone', 'formation_sanitaire')}),
+        ('Informations supplémentaires', {'fields': ('role', 'phone', 'site')}),
     )
     add_fieldsets = BaseUserAdmin.add_fieldsets + (
-        ('Informations supplémentaires', {'fields': ('role', 'phone', 'formation_sanitaire')}),
+        ('Informations supplémentaires', {'fields': ('role', 'phone', 'site')}),
     )
 
 
 @admin.register(ASC)
 class ASCAdmin(admin.ModelAdmin):
-    list_display = ['code', 'first_name', 'last_name', 'phone', 'formation_sanitaire', 'supervisor', 'is_active']
+    list_display = ['code', 'first_name', 'last_name', 'phone', 'site', 'supervisor', 'is_active']
     list_filter = [
         'is_active',
-        'formation_sanitaire__commune__district__region',
-        'formation_sanitaire__commune__district',
-        'formation_sanitaire'
+        'site__commune__district__region',
+        'site__commune__district',
+        'site'
     ]
     search_fields = ['code', 'first_name', 'last_name', 'phone', 'email']
     ordering = ['last_name', 'first_name']
@@ -36,7 +36,7 @@ class ASCAdmin(admin.ModelAdmin):
             'fields': ('first_name', 'last_name', 'code', 'gender', 'phone', 'email')
         }),
         ('Localisation', {
-            'fields': ('formation_sanitaire', 'zone_asc', 'supervisor')
+            'fields': ('site', 'zone_asc', 'supervisor')
         }),
         ('Statut', {
             'fields': ('is_active', 'start_date', 'end_date')

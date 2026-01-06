@@ -40,14 +40,14 @@
             </div>
         </div>
 
-        <!-- Formation Sanitaire -->
-        {% if asc.formation_sanitaire %}
+        <!-- Site -->
+        {% if asc.site %}
         <div class="card mb-4">
             <div class="card-header bg-info text-white">
-                <h6 class="mb-0"><i class="bi bi-hospital"></i> Formation Sanitaire</h6>
+                <h6 class="mb-0"><i class="bi bi-hospital"></i> Site</h6>
             </div>
             <div class="card-body">
-                <p class="mb-0">{{ asc.formation_sanitaire }}</p>
+                <p class="mb-0">{{ asc.site }}</p>
                 {% if asc.zone_asc %}
                 <p class="mb-0 mt-2"><strong>Zone:</strong> {{ asc.zone_asc }}</p>
                 {% endif %}

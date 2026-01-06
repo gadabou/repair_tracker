@@ -53,9 +53,9 @@ class Commune(models.Model):
         return f"{self.name} ({self.district.name})"
 
 
-class FormationSanitaire(models.Model):
-    """Formation Sanitaire (Centre de santé)"""
-    commune = models.ForeignKey(Commune, on_delete=models.CASCADE, related_name='formations_sanitaires')
+class Site(models.Model):
+    """Site (Centre de santé)"""
+    commune = models.ForeignKey(Commune, on_delete=models.CASCADE, related_name='sites')
     name = models.CharField(max_length=150, verbose_name="Nom")
     code = models.CharField(max_length=20, unique=True, verbose_name="Code")
     address = models.TextField(blank=True, verbose_name="Adresse")
@@ -64,8 +64,8 @@ class FormationSanitaire(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        verbose_name = "Formation Sanitaire"
-        verbose_name_plural = "Formations Sanitaires"
+        verbose_name = "Site"
+        verbose_name_plural = "Sites"
         ordering = ['commune', 'name']
 
     def __str__(self):
@@ -82,22 +82,21 @@ class FormationSanitaire(models.Model):
 
 class ZoneASC(models.Model):
     """Zone d'intervention d'un ASC"""
-    formation_sanitaire = models.ForeignKey(
-        FormationSanitaire,
+    site = models.ForeignKey(
+        Site,
         on_delete=models.CASCADE,
         related_name='zones_asc'
     )
     name = models.CharField(max_length=100, verbose_name="Nom de la zone")
     code = models.CharField(max_length=20, verbose_name="Code")
-    population = models.IntegerField(null=True, blank=True, verbose_name="Population estimée")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         verbose_name = "Zone ASC"
         verbose_name_plural = "Zones ASC"
-        ordering = ['formation_sanitaire', 'name']
-        unique_together = ['formation_sanitaire', 'code']
+        ordering = ['site', 'name']
+        unique_together = ['site', 'code']
 
     def __str__(self):
-        return f"{self.name} ({self.formation_sanitaire.name})"
+        return f"{self.name} ({self.site.name})"

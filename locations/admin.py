@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Region, District, Commune, FormationSanitaire, ZoneASC
+from .models import Region, District, Commune, Site, ZoneASC
 
 
 @admin.register(Region)
@@ -25,8 +25,8 @@ class CommuneAdmin(admin.ModelAdmin):
     ordering = ['district', 'name']
 
 
-@admin.register(FormationSanitaire)
-class FormationSanitaireAdmin(admin.ModelAdmin):
+@admin.register(Site)
+class SiteAdmin(admin.ModelAdmin):
     list_display = ['name', 'commune', 'code', 'phone', 'created_at']
     list_filter = ['commune__district__region', 'commune__district', 'commune']
     search_fields = ['name', 'code', 'phone', 'commune__name']
@@ -35,7 +35,7 @@ class FormationSanitaireAdmin(admin.ModelAdmin):
 
 @admin.register(ZoneASC)
 class ZoneASCAdmin(admin.ModelAdmin):
-    list_display = ['name', 'formation_sanitaire', 'code', 'population', 'created_at']
-    list_filter = ['formation_sanitaire']
-    search_fields = ['name', 'code', 'formation_sanitaire__name']
-    ordering = ['formation_sanitaire', 'name']
+    list_display = ['name', 'site', 'code', 'created_at']
+    list_filter = ['site']
+    search_fields = ['name', 'code', 'site__name']
+    ordering = ['site', 'name']

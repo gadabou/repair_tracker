@@ -38,7 +38,7 @@
                 <tr>
                     <th>Code</th>
                     <th>Nom Complet</th>
-                    <th>Formation Sanitaire</th>
+                    <th>Site</th>
                     <th>Superviseur</th>
                     <th>Équipements</th>
                     <th>Statut</th>
@@ -50,7 +50,7 @@
                 <tr>
                     <td><strong>{{ asc.code }}</strong></td>
                     <td>{{ asc.get_full_name }}</td>
-                    <td>{{ asc.formation_sanitaire|default:"-" }}</td>
+                    <td>{{ asc.site|default:"-" }}</td>
                     <td>
                         {% if asc.supervisor %}
                         {{ asc.supervisor.get_full_name }}

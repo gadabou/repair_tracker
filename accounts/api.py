@@ -4,20 +4,20 @@ from .models import ASC, User
 
 class ASCSerializer(serializers.ModelSerializer):
     supervisor_name = serializers.CharField(source='supervisor.get_full_name', read_only=True)
-    formation_sanitaire_name = serializers.StringRelatedField(source='formation_sanitaire', read_only=True)
+    site_name = serializers.StringRelatedField(source='site', read_only=True)
 
     class Meta:
         model = ASC
         fields = [
             'id', 'first_name', 'last_name', 'code', 'gender', 'phone', 'email',
-            'formation_sanitaire', 'formation_sanitaire_name', 'zone_asc',
+            'site', 'site_name', 'zone_asc',
             'supervisor', 'supervisor_name', 'is_active', 'start_date',
             'end_date', 'created_at'
         ]
 
 
 class ASCViewSet(viewsets.ModelViewSet):
-    queryset = ASC.objects.all().select_related('formation_sanitaire', 'supervisor', 'zone_asc')
+    queryset = ASC.objects.all().select_related('site', 'supervisor', 'zone_asc')
     serializer_class = ASCSerializer
 
     def get_queryset(self):

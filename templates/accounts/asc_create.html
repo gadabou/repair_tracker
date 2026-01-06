@@ -78,12 +78,12 @@
                             <hr>
                         </div>
                         <div class="col-md-6">
-                            <label for="formation_sanitaire" class="form-label">
-                                Formation Sanitaire <span class="text-danger">*</span>
+                            <label for="site" class="form-label">
+                                Site <span class="text-danger">*</span>
                             </label>
-                            <select class="form-select" id="formation_sanitaire" name="formation_sanitaire" required>
+                            <select class="form-select" id="site" name="site" required>
                                 <option value="">-- Sélectionner une formation sanitaire --</option>
-                                {% for fs in formations_sanitaires %}
+                                {% for fs in sites %}
                                 <option value="{{ fs.id }}">
                                     {{ fs.name }} - {{ fs.commune.name }} ({{ fs.commune.district.name }})
                                 </option>
@@ -95,7 +95,7 @@
                             <select class="form-select" id="zone_asc" name="zone_asc">
                                 <option value="">-- Sélectionner une zone (optionnel) --</option>
                                 {% for zone in zones_asc %}
-                                <option value="{{ zone.id }}">{{ zone.name }} - {{ zone.formation_sanitaire.name }}</option>
+                                <option value="{{ zone.id }}">{{ zone.name }} - {{ zone.site.name }}</option>
                                 {% endfor %}
                             </select>
                         </div>

@@ -2,13 +2,13 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import ASC, User
-from locations.models import FormationSanitaire, ZoneASC
+from locations.models import Site, ZoneASC
 
 
 @login_required
 def asc_list(request):
     """Liste des ASCs avec filtres"""
-    ascs = ASC.objects.all().select_related('formation_sanitaire', 'supervisor')
+    ascs = ASC.objects.all().select_related('site', 'supervisor')
 
     search = request.GET.get('search')
     if search:
@@ -21,7 +21,7 @@ def asc_list(request):
 @login_required
 def asc_detail(request, pk):
     """Détail d'un ASC"""
-    asc = get_object_or_404(ASC.objects.select_related('formation_sanitaire', 'supervisor'), pk=pk)
+    asc = get_object_or_404(ASC.objects.select_related('site', 'supervisor'), pk=pk)
     equipments = asc.equipments.all()
     tickets = asc.repair_tickets.all()
 
@@ -44,7 +44,7 @@ def asc_create(request):
         gender = request.POST.get('gender')
         phone = request.POST.get('phone')
         email = request.POST.get('email')
-        formation_sanitaire_id = request.POST.get('formation_sanitaire')
+        site_id = request.POST.get('site')
         zone_asc_id = request.POST.get('zone_asc')
         supervisor_id = request.POST.get('supervisor')
         start_date = request.POST.get('start_date')
@@ -56,7 +56,7 @@ def asc_create(request):
             return redirect('accounts:asc_create')
 
         # Récupérer les objets liés
-        formation_sanitaire = get_object_or_404(FormationSanitaire, pk=formation_sanitaire_id)
+        site = get_object_or_404(Site, pk=site_id)
         zone_asc = None
         if zone_asc_id:
             zone_asc = get_object_or_404(ZoneASC, pk=zone_asc_id)
@@ -73,7 +73,7 @@ def asc_create(request):
             gender=gender,
             phone=phone,
             email=email,
-            formation_sanitaire=formation_sanitaire,
+            site=site,
             zone_asc=zone_asc,
             supervisor=supervisor,
             start_date=start_date if start_date else None,
@@ -85,12 +85,12 @@ def asc_create(request):
         return redirect('accounts:asc_detail', pk=asc.pk)
 
     # GET - Afficher le formulaire
-    formations_sanitaires = FormationSanitaire.objects.all().select_related('commune__district__region')
-    zones_asc = ZoneASC.objects.all().select_related('formation_sanitaire__commune')
+    sites = Site.objects.all().select_related('commune__district__region')
+    zones_asc = ZoneASC.objects.all().select_related('site__commune')
     supervisors = User.objects.filter(role='SUPERVISOR', is_active=True)
 
     context = {
-        'formations_sanitaires': formations_sanitaires,
+        'sites': sites,
         'zones_asc': zones_asc,
         'supervisors': supervisors,
         'gender_choices': ASC.GENDER_CHOICES,
