@@ -1,5 +1,14 @@
 from django.contrib import admin
-from .models import RepairTicket, Issue, TicketEvent, TicketComment
+from .models import RepairTicket, Issue, TicketEvent, TicketComment, ProblemType
+
+
+@admin.register(ProblemType)
+class ProblemTypeAdmin(admin.ModelAdmin):
+    list_display = ['name', 'code', 'category', 'display_order', 'is_active']
+    list_filter = ['category', 'is_active']
+    search_fields = ['name', 'code']
+    ordering = ['category', 'display_order', 'name']
+    list_editable = ['display_order', 'is_active']
 
 
 class IssueInline(admin.TabularInline):
@@ -52,9 +61,9 @@ class RepairTicketAdmin(admin.ModelAdmin):
 
 @admin.register(Issue)
 class IssueAdmin(admin.ModelAdmin):
-    list_display = ['ticket', 'issue_type', 'created_at']
-    list_filter = ['issue_type', 'created_at']
-    search_fields = ['ticket__ticket_number', 'description']
+    list_display = ['ticket', 'problem_type', 'created_at']
+    list_filter = ['problem_type__category', 'created_at']
+    search_fields = ['ticket__ticket_number', 'description', 'problem_type__name']
     ordering = ['-created_at']
 
 

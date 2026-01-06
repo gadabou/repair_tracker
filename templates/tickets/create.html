@@ -27,6 +27,7 @@
         <label class="form-label fw-bold">Type(s) de problème <span class="text-danger">*</span></label>
         <small class="text-muted d-block mb-2">Sélectionnez un ou plusieurs problèmes constatés</small>
 
+        {% if hardware_problems %}
         <div class="card">
             <div class="card-header bg-light">
                 <strong>Problèmes Matériels</strong>
@@ -34,65 +35,22 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-6">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="issue_types" value="SCREEN_BROKEN" id="issue_screen_broken">
-                            <label class="form-check-label" for="issue_screen_broken">Écran cassé</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="issue_types" value="SCREEN_NOT_WORKING" id="issue_screen_not_working">
-                            <label class="form-check-label" for="issue_screen_not_working">Écran ne fonctionne pas</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="issue_types" value="BATTERY_ISSUE" id="issue_battery">
-                            <label class="form-check-label" for="issue_battery">Problème de batterie</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="issue_types" value="CHARGING_ISSUE" id="issue_charging">
-                            <label class="form-check-label" for="issue_charging">Problème de charge</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="issue_types" value="BUTTON_ISSUE" id="issue_button">
-                            <label class="form-check-label" for="issue_button">Bouton(s) défectueux</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="issue_types" value="CAMERA_ISSUE" id="issue_camera">
-                            <label class="form-check-label" for="issue_camera">Problème de caméra</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="issue_types" value="MICROPHONE_ISSUE" id="issue_microphone">
-                            <label class="form-check-label" for="issue_microphone">Problème de microphone</label>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="issue_types" value="SPEAKER_ISSUE" id="issue_speaker">
-                            <label class="form-check-label" for="issue_speaker">Problème de haut-parleur</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="issue_types" value="NETWORK_ISSUE" id="issue_network">
-                            <label class="form-check-label" for="issue_network">Problème de réseau</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="issue_types" value="WIFI_ISSUE" id="issue_wifi">
-                            <label class="form-check-label" for="issue_wifi">Problème WiFi</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="issue_types" value="BLUETOOTH_ISSUE" id="issue_bluetooth">
-                            <label class="form-check-label" for="issue_bluetooth">Problème Bluetooth</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="issue_types" value="WATER_DAMAGE" id="issue_water">
-                            <label class="form-check-label" for="issue_water">Dégât des eaux</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="issue_types" value="PHYSICAL_DAMAGE" id="issue_physical">
-                            <label class="form-check-label" for="issue_physical">Dommage physique</label>
-                        </div>
+                        {% for problem in hardware_problems %}
+                            {% if forloop.counter0 == hardware_problems|length|add:1|divisibleby:2 %}
+                                </div><div class="col-md-6">
+                            {% endif %}
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="problem_types" value="{{ problem.id }}" id="problem_{{ problem.id }}">
+                                <label class="form-check-label" for="problem_{{ problem.id }}">{{ problem.name }}</label>
+                            </div>
+                        {% endfor %}
                     </div>
                 </div>
             </div>
         </div>
+        {% endif %}
 
+        {% if software_problems %}
         <div class="card mt-3">
             <div class="card-header bg-light">
                 <strong>Problèmes Logiciels</strong>
@@ -100,45 +58,33 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-6">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="issue_types" value="SOFTWARE_CRASH" id="issue_crash">
-                            <label class="form-check-label" for="issue_crash">Application plante</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="issue_types" value="SLOW_PERFORMANCE" id="issue_slow">
-                            <label class="form-check-label" for="issue_slow">Performance lente</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="issue_types" value="SYSTEM_UPDATE" id="issue_update">
-                            <label class="form-check-label" for="issue_update">Mise à jour système nécessaire</label>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="issue_types" value="APP_NOT_WORKING" id="issue_app">
-                            <label class="form-check-label" for="issue_app">Application ne fonctionne pas</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="issue_types" value="DATA_LOSS" id="issue_data">
-                            <label class="form-check-label" for="issue_data">Perte de données</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="issue_types" value="VIRUS_MALWARE" id="issue_virus">
-                            <label class="form-check-label" for="issue_virus">Virus/Malware</label>
-                        </div>
+                        {% for problem in software_problems %}
+                            {% if forloop.counter0 == software_problems|length|add:1|divisibleby:2 %}
+                                </div><div class="col-md-6">
+                            {% endif %}
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="problem_types" value="{{ problem.id }}" id="problem_{{ problem.id }}">
+                                <label class="form-check-label" for="problem_{{ problem.id }}">{{ problem.name }}</label>
+                            </div>
+                        {% endfor %}
                     </div>
                 </div>
             </div>
         </div>
+        {% endif %}
 
+        {% if other_problems %}
         <div class="card mt-3">
             <div class="card-body">
+                {% for problem in other_problems %}
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="issue_types" value="OTHER" id="issue_other">
-                    <label class="form-check-label fw-bold" for="issue_other">Autre problème</label>
+                    <input class="form-check-input" type="checkbox" name="problem_types" value="{{ problem.id }}" id="problem_{{ problem.id }}">
+                    <label class="form-check-label fw-bold" for="problem_{{ problem.id }}">{{ problem.name }}</label>
                 </div>
+                {% endfor %}
             </div>
         </div>
+        {% endif %}
 
         <div id="issue-error" class="text-danger small mt-2" style="display: none;">
             Veuillez sélectionner au moins un problème
@@ -166,7 +112,7 @@
 $(document).ready(function() {
     // Validation du formulaire - au moins un problème doit être sélectionné
     $('#ticketForm').on('submit', function(e) {
-        const checkedIssues = $('input[name="issue_types"]:checked').length;
+        const checkedIssues = $('input[name="problem_types"]:checked').length;
         const errorDiv = $('#issue-error');
 
         if (checkedIssues === 0) {
@@ -182,8 +128,8 @@ $(document).ready(function() {
     });
 
     // Cacher le message d'erreur quand on sélectionne un problème
-    $('input[name="issue_types"]').on('change', function() {
-        if ($('input[name="issue_types"]:checked').length > 0) {
+    $('input[name="problem_types"]').on('change', function() {
+        if ($('input[name="problem_types"]:checked').length > 0) {
             $('#issue-error').hide();
         }
     });

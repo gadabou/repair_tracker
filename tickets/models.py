@@ -5,6 +5,51 @@ from accounts.models import User, ASC
 from assets.models import Equipment
 
 
+class ProblemType(models.Model):
+    """Type de problème pour les tickets de réparation"""
+    CATEGORY_CHOICES = [
+        ('HARDWARE', 'Problèmes Matériels'),
+        ('SOFTWARE', 'Problèmes Logiciels'),
+        ('OTHER', 'Autre'),
+    ]
+
+    name = models.CharField(
+        max_length=100,
+        verbose_name="Nom du problème"
+    )
+    code = models.CharField(
+        max_length=50,
+        unique=True,
+        verbose_name="Code unique",
+        help_text="Code unique pour identifier le problème (ex: SCREEN_BROKEN)"
+    )
+    category = models.CharField(
+        max_length=20,
+        choices=CATEGORY_CHOICES,
+        verbose_name="Catégorie"
+    )
+    display_order = models.IntegerField(
+        default=0,
+        verbose_name="Ordre d'affichage",
+        help_text="Les problèmes sont affichés par ordre croissant"
+    )
+    is_active = models.BooleanField(
+        default=True,
+        verbose_name="Actif",
+        help_text="Seuls les types actifs sont affichés dans le formulaire"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Type de problème"
+        verbose_name_plural = "Types de problèmes"
+        ordering = ['category', 'display_order', 'name']
+
+    def __str__(self):
+        return f"{self.name} ({self.get_category_display()})"
+
+
 class RepairTicket(models.Model):
     """Ticket de réparation / acheminement"""
     STATUS_CHOICES = [
@@ -249,43 +294,16 @@ class RepairTicket(models.Model):
 
 class Issue(models.Model):
     """Problème signalé sur un ticket"""
-    ISSUE_TYPE_CHOICES = [
-        # Problèmes matériels
-        ('SCREEN_BROKEN', 'Écran cassé'),
-        ('SCREEN_NOT_WORKING', 'Écran ne fonctionne pas'),
-        ('BATTERY_ISSUE', 'Problème de batterie'),
-        ('CHARGING_ISSUE', 'Problème de charge'),
-        ('BUTTON_ISSUE', 'Bouton(s) défectueux'),
-        ('CAMERA_ISSUE', 'Problème de caméra'),
-        ('MICROPHONE_ISSUE', 'Problème de microphone'),
-        ('SPEAKER_ISSUE', 'Problème de haut-parleur'),
-        ('NETWORK_ISSUE', 'Problème de réseau'),
-        ('WIFI_ISSUE', 'Problème WiFi'),
-        ('BLUETOOTH_ISSUE', 'Problème Bluetooth'),
-        ('WATER_DAMAGE', 'Dégât des eaux'),
-        ('PHYSICAL_DAMAGE', 'Dommage physique'),
-
-        # Problèmes logiciels
-        ('SOFTWARE_CRASH', 'Application plante'),
-        ('SLOW_PERFORMANCE', 'Performance lente'),
-        ('SYSTEM_UPDATE', 'Mise à jour système nécessaire'),
-        ('APP_NOT_WORKING', 'Application ne fonctionne pas'),
-        ('DATA_LOSS', 'Perte de données'),
-        ('VIRUS_MALWARE', 'Virus/Malware'),
-
-        # Autres
-        ('OTHER', 'Autre problème'),
-    ]
-
     ticket = models.ForeignKey(
         RepairTicket,
         on_delete=models.CASCADE,
         related_name='issues',
         verbose_name="Ticket"
     )
-    issue_type = models.CharField(
-        max_length=30,
-        choices=ISSUE_TYPE_CHOICES,
+    problem_type = models.ForeignKey(
+        ProblemType,
+        on_delete=models.PROTECT,
+        related_name='issues',
         verbose_name="Type de problème"
     )
     description = models.TextField(blank=True, verbose_name="Description additionnelle")
@@ -297,7 +315,7 @@ class Issue(models.Model):
         ordering = ['created_at']
 
     def __str__(self):
-        return f"{self.get_issue_type_display()} - {self.ticket.ticket_number}"
+        return f"{self.problem_type.name} - {self.ticket.ticket_number}"
 
 
 class TicketEvent(models.Model):

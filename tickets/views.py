@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.utils import timezone
 from django.http import JsonResponse
 from django.db import models
-from .models import RepairTicket, TicketEvent, TicketComment, Issue, DelayAlertRecipient, DelayAlertLog
+from .models import RepairTicket, TicketEvent, TicketComment, Issue, DelayAlertRecipient, DelayAlertLog, ProblemType
 from assets.models import Equipment
 from accounts.models import User
 
@@ -78,14 +78,15 @@ def ticket_create(request):
         )
 
         # Créer les issues
-        issue_types = request.POST.getlist('issue_types')
+        problem_type_ids = request.POST.getlist('problem_types')
         issue_description = request.POST.get('issue_description', '')
 
-        if issue_types:
-            for issue_type in issue_types:
+        if problem_type_ids:
+            for problem_type_id in problem_type_ids:
+                problem_type = get_object_or_404(ProblemType, pk=problem_type_id)
                 Issue.objects.create(
                     ticket=ticket,
-                    issue_type=issue_type,
+                    problem_type=problem_type,
                     description=issue_description
                 )
 
@@ -105,10 +106,20 @@ def ticket_create(request):
         messages.success(request, f'Ticket {ticket.ticket_number} créé avec succès!')
         return redirect('tickets:detail', pk=ticket.pk)
 
+    # Récupérer tous les types de problèmes actifs et les grouper par catégorie
+    problem_types = ProblemType.objects.filter(is_active=True).order_by('category', 'display_order', 'name')
+
+    # Grouper par catégorie
+    hardware_problems = problem_types.filter(category='HARDWARE')
+    software_problems = problem_types.filter(category='SOFTWARE')
+    other_problems = problem_types.filter(category='OTHER')
+
     equipments = Equipment.objects.filter(status__in=['FAULTY', 'FUNCTIONAL']).select_related('owner')
     context = {
         'equipments': equipments,
-        'issue_choices': Issue.ISSUE_TYPE_CHOICES,
+        'hardware_problems': hardware_problems,
+        'software_problems': software_problems,
+        'other_problems': other_problems,
     }
     return render(request, 'tickets/create.html', context)
 
