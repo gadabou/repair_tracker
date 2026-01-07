@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notification Repair Tracker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #0d6efd;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 5px 5px 0 0;
+        }
+        .content {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border: 1px solid #dee2e6;
+        }
+        .ticket-info {
+            background-color: white;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #0d6efd;
+            border-radius: 3px;
+        }
+        .ticket-info strong {
+            color: #0d6efd;
+        }
+        .button {
+            display: inline-block;
+            background-color: #0d6efd;
+            color: white;
+            padding: 12px 30px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 12px;
+            color: #6c757d;
+            border-top: 1px solid #dee2e6;
+            margin-top: 20px;
+        }
+        .comment-box {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 10px;
+            margin: 15px 0;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>IH Equipment Manager</h1>
+        <p>Notification de Ticket</p>
+    </div>
+
+    <div class="content">
+        <h2>Bonjour{% if recipient %} {{ recipient.get_full_name }}{% endif %},</h2>
+
+        <p>Vous avez reçu un nouveau ticket à traiter dans le système Repair Tracker.</p>
+
+        <div class="ticket-info">
+            <h3>📋 Informations du Ticket</h3>
+            <p><strong>Numéro :</strong> {{ ticket.ticket_number }}</p>
+            <p><strong>Équipement :</strong> {{ ticket.equipment.brand }} {{ ticket.equipment.model }} ({{ ticket.equipment.imei }})</p>
+            <p><strong>ASC :</strong> {{ ticket.asc.get_full_name }} ({{ ticket.asc.code }})</p>
+            {% if ticket.asc.site %}
+            <p><strong>Site :</strong> {{ ticket.asc.site.name }}</p>
+            {% endif %}
+            <p><strong>Département destinataire :</strong> {{ to_role_display }}</p>
+            <p><strong>Envoyé par :</strong> {{ sender.get_full_name }} ({{ sender.get_role_display }})</p>
+            <p><strong>Date d'envoi :</strong> {{ ticket.updated_at|date:"d/m/Y à H:i" }}</p>
+        </div>
+
+        {% if ticket.initial_problem_description %}
+        <div class="ticket-info">
+            <h3>🔍 Description du problème</h3>
+            <p>{{ ticket.initial_problem_description }}</p>
+        </div>
+        {% endif %}
+
+        {% if comment %}
+        <div class="comment-box">
+            <h4>💬 Commentaire</h4>
+            <p>{{ comment }}</p>
+        </div>
+        {% endif %}
+
+        <div style="text-align: center;">
+            <a href="{{ ticket_url }}" class="button">Voir le Ticket</a>
+        </div>
+
+        <p style="margin-top: 20px;">
+            <strong>Action requise :</strong> Veuillez consulter ce ticket et effectuer les actions nécessaires dans le système.
+        </p>
+    </div>
+
+    <div class="footer">
+        <p>Cet email a été envoyé automatiquement par Repair Tracker.</p>
+        <p>Suivi des réparations d'équipements ASC © 2025</p>
+        <p>Pour toute question, veuillez contacter votre administrateur système.</p>
+    </div>
+</body>
+</html>

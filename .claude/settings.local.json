@@ -25,7 +25,8 @@
       "Bash(python api/getdata.py:*)",
       "Bash(python api/test_auth.py:*)",
       "Bash(python:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(curl:*)"
     ],
     "deny": [],
     "ask": []

@@ -156,6 +156,7 @@ def ticket_receive(request, pk):
 def ticket_send(request, pk):
     """Envoyer un ticket à l'étape suivante"""
     from accounts.models import User
+    from .email_notifications import send_ticket_notification
 
     ticket = get_object_or_404(RepairTicket, pk=pk)
 
@@ -220,12 +221,28 @@ def ticket_send(request, pk):
 
         ticket.save()
 
-        # Notifier le destinataire (optionnel, sera implémenté dans la commande de rappel)
+        # Envoyer la notification par email
+        email_sent = send_ticket_notification(
+            ticket=ticket,
+            recipient=recipient,
+            sender=request.user,
+            to_role=to_role,
+            comment=comment
+        )
+
+        # Notifier l'utilisateur
         destination_name = dict(RepairTicket.STAGE_CHOICES)[to_role]
         if recipient:
-            messages.success(request, f'Ticket envoyé à {recipient.get_full_name()} ({destination_name})!')
+            success_msg = f'Ticket envoyé à {recipient.get_full_name()} ({destination_name})!'
         else:
-            messages.success(request, f'Ticket envoyé à {destination_name}!')
+            success_msg = f'Ticket envoyé à {destination_name}!'
+
+        if email_sent:
+            success_msg += ' Une notification par email a été envoyée.'
+        else:
+            success_msg += ' (Email non envoyé - vérifier la configuration)'
+
+        messages.success(request, success_msg)
 
         return redirect('tickets:detail', pk=ticket.pk)
 
