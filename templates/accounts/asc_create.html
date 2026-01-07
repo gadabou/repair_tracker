@@ -59,10 +59,8 @@
                             </select>
                         </div>
                         <div class="col-md-4">
-                            <label for="phone" class="form-label">
-                                Téléphone <span class="text-danger">*</span>
-                            </label>
-                            <input type="tel" class="form-control" id="phone" name="phone" required
+                            <label for="phone" class="form-label">Téléphone</label>
+                            <input type="tel" class="form-control" id="phone" name="phone"
                                    placeholder="+228 XX XX XX XX">
                         </div>
                         <div class="col-md-4">
@@ -77,7 +75,7 @@
                             <h6 class="text-primary"><i class="bi bi-geo-alt"></i> Localisation</h6>
                             <hr>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                             <label for="site" class="form-label">
                                 Site <span class="text-danger">*</span>
                             </label>
@@ -89,15 +87,9 @@
                                 </option>
                                 {% endfor %}
                             </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="zone_asc" class="form-label">Zone ASC</label>
-                            <select class="form-select" id="zone_asc" name="zone_asc">
-                                <option value="">-- Sélectionner une zone (optionnel) --</option>
-                                {% for zone in zones_asc %}
-                                <option value="{{ zone.id }}">{{ zone.name }} - {{ zone.site.name }}</option>
-                                {% endfor %}
-                            </select>
+                            <small class="form-text text-muted">
+                                <i class="bi bi-info-circle"></i> Une zone ASC sera automatiquement créée avec le nom "Zone [Prénom] [Nom]"
+                            </small>
                         </div>
                     </div>
 

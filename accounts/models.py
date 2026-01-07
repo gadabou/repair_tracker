@@ -80,13 +80,15 @@ class ASC(models.Model):
     last_name = models.CharField(max_length=100, verbose_name="Nom")
     code = models.CharField(max_length=50, unique=True, verbose_name="Code ASC")
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES, blank=True, verbose_name="Genre")
-    phone = models.CharField(max_length=20, verbose_name="Téléphone")
+    phone = models.CharField(max_length=20, blank=True, verbose_name="Téléphone")
     email = models.EmailField(blank=True, verbose_name="Email")
 
     # Localisation
     site = models.ForeignKey(
         Site,
         on_delete=models.CASCADE,
+        null=True,
+        blank=True,
         related_name='ascs',
         verbose_name="Site"
     )
@@ -125,19 +127,16 @@ class ASC(models.Model):
         ordering = ['last_name', 'first_name']
 
     def __str__(self):
-        return f"{self.first_name} {self.last_name} ({self.code} {self.site})"
+        site_info = f" - {self.site}" if self.site else ""
+        return f"{self.first_name} {self.last_name} ({self.code}{site_info})"
 
     def get_full_name(self):
         return f"{self.first_name} {self.last_name}"
 
     @property
-    def commune(self):
-        return self.site.commune
-
-    @property
     def district(self):
-        return self.site.district
+        return self.site.district if self.site else None
 
     @property
     def region(self):
-        return self.site.region
+        return self.site.region if self.site else None
