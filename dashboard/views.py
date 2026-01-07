@@ -1,5 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import LoginView
+from django.contrib import messages
 from django.db.models import Count, Q, Avg
 from django.utils import timezone
 from datetime import timedelta
@@ -7,6 +9,19 @@ from datetime import timedelta
 from tickets.models import RepairTicket
 from assets.models import Equipment
 from accounts.models import ASC
+
+
+class CustomLoginView(LoginView):
+    """Vue de connexion personnalisée avec messages d'erreur en français"""
+    template_name = 'registration/login.html'
+
+    def form_invalid(self, form):
+        """Ajoute un message d'erreur personnalisé en cas d'échec de connexion"""
+        messages.error(
+            self.request,
+            'Le nom d\'utilisateur ou le mot de passe est incorrect. Veuillez réessayer.'
+        )
+        return super().form_invalid(form)
 
 
 def home_redirect(request):

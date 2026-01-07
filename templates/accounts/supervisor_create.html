@@ -1,0 +1,272 @@
+{% extends 'base.html' %}
+
+{% block title %}Créer un Superviseur - Repair Tracker{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="bi bi-person-plus"></i> Créer un Superviseur</h1>
+    <a href="{% url 'accounts:supervisor_list' %}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Retour à la liste
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-md-10 mx-auto">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-person-badge"></i> Informations du Superviseur</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" id="supervisorForm">
+                    {% csrf_token %}
+
+                    <div class="alert alert-info mb-4">
+                        <i class="bi bi-info-circle"></i>
+                        <strong>Note :</strong> Le compte utilisateur sera créé automatiquement avec :
+                        <ul class="mb-0 mt-2">
+                            <li><strong>Nom d'utilisateur :</strong> [nom][1ère lettre prénom][dernière lettre prénom]</li>
+                            <li><strong>Mot de passe :</strong> [nom d'utilisateur inversé]@2026</li>
+                            <li><strong>Rôle :</strong> SUPERVISEUR</li>
+                            <li><strong>Groupe :</strong> supervisors</li>
+                        </ul>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <h6 class="text-primary"><i class="bi bi-person"></i> Informations Personnelles</h6>
+                            <hr>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="first_name" class="form-label">
+                                Prénom <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control" id="first_name" name="first_name" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="last_name" class="form-label">
+                                Nom <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control" id="last_name" name="last_name" required>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email"
+                                   placeholder="exemple@email.com">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="phone" class="form-label">Téléphone</label>
+                            <input type="tel" class="form-control" id="phone" name="phone"
+                                   placeholder="+228 XX XX XX XX">
+                        </div>
+                    </div>
+
+                    <div class="row mb-3" id="username-preview-container" style="display: none;">
+                        <div class="col-md-12">
+                            <div class="alert alert-success">
+                                <i class="bi bi-person-check"></i>
+                                <strong>Nom d'utilisateur généré :</strong> <span id="username-preview" class="fs-6 fw-bold"></span><br>
+                                <strong>Mot de passe généré :</strong> <span id="password-preview" class="fs-6 fw-bold"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <h6 class="text-primary"><i class="bi bi-geo-alt"></i> Localisation</h6>
+                            <hr>
+                        </div>
+
+                        <div class="col-md-12 mb-3">
+                            <label for="district" class="form-label">
+                                District <span class="text-danger">*</span>
+                            </label>
+                            <select class="form-select" id="district" name="district" required>
+                                <option value="">-- Sélectionner un district --</option>
+                                {% for district in districts %}
+                                <option value="{{ district.id }}" data-code="{{ district.code }}">
+                                    {{ district.name }} ({{ district.region.name }})
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <small class="form-text text-muted">
+                                <i class="bi bi-info-circle"></i> Le superviseur gérera les sites de ce district
+                            </small>
+                        </div>
+
+                        <div class="col-md-12" id="code-preview-container" style="display: none;">
+                            <div class="alert alert-info">
+                                <i class="bi bi-hash"></i> <strong>Code généré automatiquement:</strong>
+                                <span id="code-preview" class="fs-5 fw-bold"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12" id="sites-container" style="display: none;">
+                            <label class="form-label">
+                                Sites gérés
+                            </label>
+                            <div class="alert alert-info mb-3">
+                                <i class="bi bi-info-circle"></i>
+                                Sélectionnez les sites que ce superviseur gérera dans le district choisi
+                            </div>
+
+                            <div id="sites-list" style="max-height: 400px; overflow-y: auto; border: 1px solid #dee2e6; padding: 15px; border-radius: 5px;">
+                                {% for site in sites %}
+                                <div class="form-check site-item" data-district-id="{{ site.district.id }}" style="display: none;">
+                                    <input class="form-check-input site-checkbox" type="checkbox"
+                                           name="sites" value="{{ site.id }}" id="site_{{ site.id }}">
+                                    <label class="form-check-label" for="site_{{ site.id }}">
+                                        <strong>{{ site.name }}</strong> <span class="text-muted">({{ site.code }})</span>
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <small class="form-text text-muted mt-2 d-block">
+                                <i class="bi bi-check2-square"></i> Vous pouvez sélectionner plusieurs sites
+                            </small>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'accounts:supervisor_list' %}" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Annuler
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Créer le Superviseur
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Fonction pour générer le nom d'utilisateur et le mot de passe
+    function generateCredentials() {
+        const firstName = $('#first_name').val().trim();
+        const lastName = $('#last_name').val().trim();
+
+        if (firstName && lastName) {
+            // Générer le nom d'utilisateur: [nom][1ère lettre prénom][dernière lettre prénom]
+            const firstLetter = firstName[0].toLowerCase();
+            const lastLetter = firstName[firstName.length - 1].toLowerCase();
+            const username = `${lastName.toLowerCase()}${firstLetter}${lastLetter}`;
+
+            // Générer le mot de passe: [nom d'utilisateur inversé]@2026
+            const password = `${username.split('').reverse().join('')}@2026`;
+
+            // Afficher les credentials générés
+            $('#username-preview').text(username);
+            $('#password-preview').text(password);
+            $('#username-preview-container').show();
+        } else {
+            $('#username-preview-container').hide();
+        }
+    }
+
+    // Générer les credentials quand le prénom ou le nom change
+    $('#first_name, #last_name').on('input blur', function() {
+        generateCredentials();
+    });
+
+    // Gestion du changement de district
+    $('#district').on('change', function() {
+        const districtId = $(this).val();
+        const districtCode = $(this).find(':selected').data('code');
+
+        if (districtId) {
+            // Afficher le conteneur du code généré
+            $('#code-preview-container').show();
+            $('#code-preview').text(districtCode + '-SUP-XXX');
+
+            // Afficher le conteneur des sites
+            $('#sites-container').show();
+
+            // Masquer tous les sites
+            $('.site-item').hide();
+            $('.site-checkbox').prop('checked', false);
+
+            // Afficher uniquement les sites du district sélectionné
+            $(`.site-item[data-district-id="${districtId}"]`).show();
+
+            // Vérifier s'il y a des sites disponibles
+            const availableSites = $(`.site-item[data-district-id="${districtId}"]`).length;
+            if (availableSites === 0) {
+                $('#sites-list').html(`
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        Aucun site disponible pour ce district.
+                    </div>
+                `);
+            }
+        } else {
+            // Masquer le conteneur du code et des sites
+            $('#code-preview-container').hide();
+            $('#sites-container').hide();
+            $('.site-item').hide();
+            $('.site-checkbox').prop('checked', false);
+        }
+    });
+
+    // Validation du formulaire
+    $('#supervisorForm').on('submit', function(e) {
+        const firstName = $('#first_name').val().trim();
+        const lastName = $('#last_name').val().trim();
+        const district = $('#district').val();
+        const phone = $('#phone').val().trim();
+        const email = $('#email').val().trim();
+
+        // Validation du prénom
+        if (!firstName) {
+            e.preventDefault();
+            alert('Le prénom est obligatoire.');
+            $('#first_name').focus();
+            return false;
+        }
+
+        // Validation du nom
+        if (!lastName) {
+            e.preventDefault();
+            alert('Le nom est obligatoire.');
+            $('#last_name').focus();
+            return false;
+        }
+
+        // Validation du district
+        if (!district) {
+            e.preventDefault();
+            alert('Veuillez sélectionner un district.');
+            $('#district').focus();
+            return false;
+        }
+
+        // Validation du téléphone (basique)
+        if (phone && phone.length < 8) {
+            e.preventDefault();
+            alert('Le numéro de téléphone doit contenir au moins 8 chiffres.');
+            $('#phone').focus();
+            return false;
+        }
+
+        // Validation de l'email (basique)
+        if (email && !email.includes('@')) {
+            e.preventDefault();
+            alert('Veuillez entrer une adresse email valide.');
+            $('#email').focus();
+            return false;
+        }
+
+        return true;
+    });
+});
+</script>
+{% endblock %}

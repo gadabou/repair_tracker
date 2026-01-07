@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from .models import User, ASC
+from .models import User, ASC, Supervisor
 
 
 @admin.register(User)
@@ -46,3 +46,37 @@ class ASCAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         }),
     )
+
+
+@admin.register(Supervisor)
+class SupervisorAdmin(admin.ModelAdmin):
+    list_display = ['code', 'first_name', 'last_name', 'email', 'phone', 'user', 'get_district', 'get_sites_count']
+    list_filter = ['sites__district__region', 'sites__district']
+    search_fields = ['code', 'first_name', 'last_name', 'email', 'phone', 'user__username', 'user__email']
+    ordering = ['last_name', 'first_name']
+    date_hierarchy = 'created_at'
+    filter_horizontal = ['sites']
+
+    fieldsets = (
+        ('Compte Utilisateur', {
+            'fields': ('user',)
+        }),
+        ('Informations Personnelles', {
+            'fields': ('first_name', 'last_name', 'code', 'email', 'phone')
+        }),
+        ('Sites Gérés', {
+            'fields': ('sites',),
+            'description': 'Tous les sites doivent appartenir au même district.'
+        }),
+    )
+
+    def get_district(self, obj):
+        """Display the district of managed sites"""
+        return obj.district.name if obj.district else '-'
+    get_district.short_description = 'District'
+    get_district.admin_order_field = 'sites__district'
+
+    def get_sites_count(self, obj):
+        """Display the number of managed sites"""
+        return obj.sites.count()
+    get_sites_count.short_description = 'Sites Count'

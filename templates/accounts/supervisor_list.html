@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% block title %}Liste des Superviseurs - Repair Tracker{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="bi bi-person-badge"></i> Liste des Superviseurs</h1>
+    <a href="{% url 'accounts:supervisor_create' %}" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> Nouveau Superviseur
+    </a>
+</div>
+
+<!-- Barre de recherche -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-10">
+                <input type="text" name="search" class="form-control" placeholder="Rechercher par nom, code, email ou téléphone..."
+                       value="{{ request.GET.search }}">
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="bi bi-search"></i> Rechercher
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Liste des superviseurs -->
+{% if supervisors %}
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">{{ supervisors|length }} Superviseur{{ supervisors|length|pluralize }}</h5>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Code</th>
+                    <th>Nom Complet</th>
+                    <th>Email</th>
+                    <th>Téléphone</th>
+                    <th>Compte Utilisateur</th>
+                    <th>District</th>
+                    <th>Sites</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for supervisor in supervisors %}
+                <tr>
+                    <td><strong>{{ supervisor.code|default:"-" }}</strong></td>
+                    <td>{{ supervisor.get_full_name }}</td>
+                    <td>{{ supervisor.email|default:"-" }}</td>
+                    <td>{{ supervisor.phone|default:"-" }}</td>
+                    <td>
+                        <span class="badge bg-info">
+                            {{ supervisor.user.username }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if supervisor.district %}
+                        {{ supervisor.district.name }}
+                        {% else %}
+                        <span class="text-muted">-</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="badge bg-success">{{ supervisor.sites.count }}</span>
+                    </td>
+                    <td class="text-end">
+                        <a href="{% url 'accounts:supervisor_edit' supervisor.pk %}" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-pencil"></i> Modifier
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="alert alert-info">
+    <i class="bi bi-info-circle"></i>
+    {% if request.GET.search %}
+    Aucun superviseur ne correspond à votre recherche.
+    {% else %}
+    Aucun superviseur enregistré pour le moment.
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

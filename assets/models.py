@@ -12,9 +12,7 @@ class Equipment(models.Model):
 
     STATUS_CHOICES = [
         ('FUNCTIONAL', 'Fonctionnel'),
-        ('FAULTY', 'En panne'),
-        ('UNDER_REPAIR', 'En réparation'),
-        ('RETIRED', 'Réformé'),
+        ('FAULTY', 'En panne')
     ]
 
     # Type et identification

@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from locations.models import Site, ZoneASC
+from django.core.exceptions import ValidationError
+from locations.models import Site, ZoneASC, District
 
 
 class User(AbstractUser):
@@ -140,3 +141,92 @@ class ASC(models.Model):
     @property
     def region(self):
         return self.site.region if self.site else None
+
+
+class Supervisor(models.Model):
+    """Superviseur avec compte utilisateur qui gère plusieurs sites d'un même district"""
+
+    # Compte utilisateur (relation one-to-one)
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        related_name='supervisor_profile',
+        verbose_name="Compte utilisateur"
+    )
+
+    # Informations personnelles
+    code = models.CharField(
+        max_length=50,
+        unique=True,
+        blank=True,
+        verbose_name="Code Superviseur"
+    )
+    first_name = models.CharField(
+        max_length=100,
+        verbose_name="Prénom"
+    )
+    last_name = models.CharField(
+        max_length=100,
+        verbose_name="Nom"
+    )
+    email = models.EmailField(
+        blank=True,
+        verbose_name="Email"
+    )
+    phone = models.CharField(
+        max_length=20,
+        blank=True,
+        verbose_name="Téléphone"
+    )
+
+    # Sites gérés (doivent être du même district)
+    sites = models.ManyToManyField(
+        Site,
+        related_name='supervisors',
+        blank=True,
+        verbose_name="Sites gérés"
+    )
+
+    # Métadonnées
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Superviseur"
+        verbose_name_plural = "Superviseurs"
+        ordering = ['last_name', 'first_name']
+
+    def __str__(self):
+        return f"{self.first_name} {self.last_name} ({self.code})"
+
+    def get_full_name(self):
+        """Return the supervisor's full name"""
+        return f"{self.first_name} {self.last_name}"
+
+    @property
+    def district(self):
+        """Return the district of managed sites (all sites should be in the same district)"""
+        first_site = self.sites.first()
+        return first_site.district if first_site else None
+
+    def clean(self):
+        """Validate supervisor data"""
+        super().clean()
+
+    def validate_sites(self):
+        """Validate that all sites belong to the same district"""
+        # Get all sites
+        sites = list(self.sites.all())
+
+        if len(sites) > 1:
+            # Get the district of the first site
+            first_district = sites[0].district
+
+            # Check if all sites belong to the same district
+            for site in sites[1:]:
+                if site.district != first_district:
+                    raise ValidationError(
+                        f'Tous les sites doivent appartenir au même district. '
+                        f'Sites trouvés dans différents districts: '
+                        f'{first_district.name} et {site.district.name}'
+                    )

@@ -1,8 +1,10 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import Group
 from django.contrib import messages
-from django.db import transaction
-from .models import ASC, User
+from django.core.exceptions import ValidationError
+from django.db import transaction, models
+from .models import ASC, User, Supervisor
 from locations.models import Site, ZoneASC, Region, District
 import warnings
 warnings.filterwarnings('ignore', message='Unverified HTTPS request')
@@ -511,3 +513,231 @@ def sync_ascs(request):
     #     messages.error(request, f'Erreur lors de la synchronisation: {str(e)}')
 
     return redirect('accounts:asc_list')
+
+
+# ============================================================================
+# SUPERVISOR VIEWS
+# ============================================================================
+
+@login_required
+def supervisor_list(request):
+    """List of supervisors with filters"""
+    supervisors = Supervisor.objects.all().select_related('user').prefetch_related('sites__district__region')
+
+    # Search
+    search = request.GET.get('search')
+    if search:
+        supervisors = supervisors.filter(
+            models.Q(code__icontains=search) |
+            models.Q(first_name__icontains=search) |
+            models.Q(last_name__icontains=search) |
+            models.Q(email__icontains=search) |
+            models.Q(phone__icontains=search)
+        )
+
+    context = {'supervisors': supervisors}
+    return render(request, 'accounts/supervisor_list.html', context)
+
+
+@login_required
+def supervisor_create(request):
+    """Créer un superviseur"""
+    if request.method == 'POST':
+        # Récupérer les données du formulaire
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+        email = request.POST.get('email')
+        phone = request.POST.get('phone')
+        district_id = request.POST.get('district')
+        site_ids = request.POST.getlist('sites')
+
+        # Validation des champs obligatoires
+        if not first_name or not last_name:
+            messages.error(request, 'Le prénom et le nom sont obligatoires.')
+            return redirect('accounts:supervisor_create')
+
+        # Récupérer le district
+        district = get_object_or_404(District, pk=district_id)
+
+        # Récupérer les sites
+        sites = Site.objects.filter(pk__in=site_ids, district=district) if site_ids else []
+
+        # Générer automatiquement le code au format DHIS2
+        # Format: [CODE_DISTRICT]-SUP-[###]
+        district_code = district.code
+
+        # Compter le nombre de superviseurs existants pour ce district
+        existing_supervisors = Supervisor.objects.filter(
+            sites__district=district
+        ).distinct().count()
+
+        # Générer le numéro séquentiel
+        sequence_number = str(existing_supervisors + 1).zfill(3)
+        code = f"{district_code}-SUP-{sequence_number}"
+
+        # Vérifier si le code existe déjà (au cas où)
+        counter = 1
+        while Supervisor.objects.filter(code=code).exists():
+            sequence_number = str(existing_supervisors + 1 + counter).zfill(3)
+            code = f"{district_code}-SUP-{sequence_number}"
+            counter += 1
+
+        # Générer le nom d'utilisateur
+        # Format: [nom][première lettre du prénom][dernière lettre du prénom]
+        first_name_clean = first_name.strip()
+        last_name_clean = last_name.strip()
+        first_letter = first_name_clean[0].lower() if first_name_clean else ''
+        last_letter = first_name_clean[-1].lower() if first_name_clean else ''
+        username = f"{last_name_clean.lower()}{first_letter}{last_letter}"
+
+        # Vérifier si le nom d'utilisateur existe déjà et ajouter un suffixe si nécessaire
+        original_username = username
+        counter = 1
+        while User.objects.filter(username=username).exists():
+            username = f"{original_username}{counter}"
+            counter += 1
+
+        # Générer le mot de passe
+        # Format: [nom d'utilisateur inversé]@2026
+        password = f"{username[::-1]}@2026"
+
+        try:
+            with transaction.atomic():
+                # Créer le compte utilisateur
+                user = User.objects.create_user(
+                    username=username,
+                    email=email if email else '',
+                    password=password,
+                    first_name=first_name,
+                    last_name=last_name,
+                    role='SUPERVISOR',
+                    phone=phone if phone else '',
+                    is_active=True,
+                    is_staff=True  # Permet la connexion à l'application
+                )
+
+                # Créer ou récupérer le groupe "supervisors"
+                supervisors_group, created = Group.objects.get_or_create(name='supervisors')
+
+                # Ajouter l'utilisateur au groupe
+                user.groups.add(supervisors_group)
+
+                # Créer le superviseur
+                supervisor = Supervisor.objects.create(
+                    user=user,
+                    first_name=first_name,
+                    last_name=last_name,
+                    email=email if email else '',
+                    code=code,
+                    phone=phone if phone else ''
+                )
+
+                # Ajouter les sites
+                if sites:
+                    supervisor.sites.set(sites)
+                    # Valider que tous les sites appartiennent au même district
+                    try:
+                        supervisor.validate_sites()
+                    except ValidationError as e:
+                        # Si la validation échoue, supprimer le superviseur et l'utilisateur
+                        supervisor.delete()
+                        user.delete()
+                        messages.error(request, str(e))
+                        return redirect('accounts:supervisor_create')
+
+                messages.success(
+                    request,
+                    f'Superviseur {supervisor.get_full_name()} ({code}) créé avec succès! '
+                    f'Nom d\'utilisateur: {username} | Mot de passe: {password}'
+                )
+                return redirect('accounts:supervisor_list')
+
+        except Exception as e:
+            messages.error(request, f'Erreur lors de la création du superviseur: {str(e)}')
+            return redirect('accounts:supervisor_create')
+
+    # GET - Afficher le formulaire
+    districts = District.objects.all().select_related('region').order_by('region__name', 'name')
+    sites = Site.objects.all().select_related('district__region').order_by('district__region__name', 'district__name', 'name')
+
+    context = {
+        'districts': districts,
+        'sites': sites,
+    }
+    return render(request, 'accounts/supervisor_create.html', context)
+
+
+@login_required
+def supervisor_edit(request, pk):
+    """Modifier un superviseur"""
+    supervisor = get_object_or_404(Supervisor.objects.select_related('user').prefetch_related('sites'), pk=pk)
+
+    if request.method == 'POST':
+        # Récupérer les données du formulaire
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+        email = request.POST.get('email')
+        phone = request.POST.get('phone')
+        district_id = request.POST.get('district')
+        site_ids = request.POST.getlist('sites')
+
+        # Validation des champs obligatoires
+        if not first_name or not last_name:
+            messages.error(request, 'Le prénom et le nom sont obligatoires.')
+            return redirect('accounts:supervisor_edit', pk=pk)
+
+        # Récupérer le district
+        district = get_object_or_404(District, pk=district_id)
+
+        # Récupérer les sites
+        sites = Site.objects.filter(pk__in=site_ids, district=district) if site_ids else []
+
+        try:
+            with transaction.atomic():
+                # Mettre à jour le superviseur
+                supervisor.first_name = first_name
+                supervisor.last_name = last_name
+                supervisor.email = email if email else ''
+                supervisor.phone = phone if phone else ''
+                supervisor.save()
+
+                # Mettre à jour l'utilisateur
+                supervisor.user.first_name = first_name
+                supervisor.user.last_name = last_name
+                supervisor.user.email = email if email else ''
+                supervisor.user.phone = phone if phone else ''
+                supervisor.user.save()
+
+                # Mettre à jour les sites
+                if sites:
+                    supervisor.sites.set(sites)
+                    # Valider que tous les sites appartiennent au même district
+                    try:
+                        supervisor.validate_sites()
+                    except ValidationError as e:
+                        messages.error(request, str(e))
+                        return redirect('accounts:supervisor_edit', pk=pk)
+                else:
+                    supervisor.sites.clear()
+
+                messages.success(request, f'Superviseur {supervisor.get_full_name()} modifié avec succès!')
+                return redirect('accounts:supervisor_list')
+
+        except Exception as e:
+            messages.error(request, f'Erreur lors de la modification du superviseur: {str(e)}')
+            return redirect('accounts:supervisor_edit', pk=pk)
+
+    # GET - Afficher le formulaire
+    districts = District.objects.all().select_related('region').order_by('region__name', 'name')
+    sites = Site.objects.all().select_related('district__region').order_by('district__region__name', 'district__name', 'name')
+
+    # Récupérer le district du superviseur (premier site)
+    current_district = supervisor.district
+
+    context = {
+        'supervisor': supervisor,
+        'districts': districts,
+        'sites': sites,
+        'current_district': current_district,
+    }
+    return render(request, 'accounts/supervisor_edit.html', context)
