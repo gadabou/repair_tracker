@@ -1,12 +1,12 @@
 #!/bin/bash
 
 # ============================================================================
-# Script de déploiement automatique - KitManager
+# Script de deploiement automatique - KitManager
 # ============================================================================
-# Ce script déploie automatiquement l'application KitManager avec Docker
+# Ce script deploie automatiquement l'application KitManager avec Docker
 # ============================================================================
 
-set -e  # Arrêter en cas d'erreur
+set -e  # Arreter en cas d'erreur
 
 # Couleurs pour l'affichage
 RED='\033[0;31m'
@@ -15,7 +15,7 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# Fonction pour afficher un message coloré
+# Fonction pour afficher un message colore
 print_message() {
     echo -e "${2}===> $1${NC}"
 }
@@ -36,46 +36,46 @@ print_error() {
     print_message "$1" "${RED}"
 }
 
-# Fonction pour vérifier si Docker est installé
+# Fonction pour verifier si Docker est installe
 check_docker() {
     if ! command -v docker &> /dev/null; then
-        print_error "Docker n'est pas installé sur ce système!"
+        print_error "Docker n'est pas installe sur ce systeme!"
         print_info "Veuillez installer Docker: https://docs.docker.com/get-docker/"
         exit 1
     fi
 
     if ! command -v docker-compose &> /dev/null && ! docker compose version &> /dev/null; then
-        print_error "Docker Compose n'est pas installé sur ce système!"
+        print_error "Docker Compose n'est pas installe sur ce systeme!"
         print_info "Veuillez installer Docker Compose: https://docs.docker.com/compose/install/"
         exit 1
     fi
 
-    print_success "Docker et Docker Compose sont installés ✓"
+    print_success "Docker et Docker Compose sont installes"
 }
 
-# Fonction pour créer le fichier .env s'il n'existe pas
+# Fonction pour creer le fichier .env s'il n'existe pas
 create_env_file() {
     if [ ! -f .env ]; then
-        print_warning "Le fichier .env n'existe pas. Création à partir de .env.example..."
+        print_warning "Le fichier .env n'existe pas. Creation a partir de .env.example..."
         if [ -f .env.example ]; then
             cp .env.example .env
-            print_success "Fichier .env créé ✓"
+            print_success "Fichier .env cree"
             print_warning "IMPORTANT: Veuillez modifier le fichier .env avec vos configurations!"
-            read -p "Appuyez sur Entrée pour continuer après avoir modifié le fichier .env..."
+            read -p "Appuyez sur Entree pour continuer apres avoir modifie le fichier .env..."
         else
             print_error "Le fichier .env.example n'existe pas!"
             exit 1
         fi
     else
-        print_success "Fichier .env existe ✓"
+        print_success "Fichier .env existe"
     fi
 }
 
-# Fonction pour arrêter et supprimer les anciens conteneurs
+# Fonction pour arreter et supprimer les anciens conteneurs
 cleanup() {
     print_info "Nettoyage des anciens conteneurs..."
     docker-compose down -v 2>/dev/null || docker compose down -v 2>/dev/null || true
-    print_success "Nettoyage terminé ✓"
+    print_success "Nettoyage termine"
 }
 
 # Fonction pour construire les images Docker
@@ -86,25 +86,25 @@ build_images() {
     else
         docker-compose build --no-cache
     fi
-    print_success "Images Docker construites ✓"
+    print_success "Images Docker construites"
 }
 
-# Fonction pour démarrer les conteneurs
+# Fonction pour demarrer les conteneurs
 start_containers() {
-    print_info "Démarrage des conteneurs..."
+    print_info "Demarrage des conteneurs..."
     if docker compose version &> /dev/null; then
         docker compose up -d
     else
         docker-compose up -d
     fi
-    print_success "Conteneurs démarrés ✓"
+    print_success "Conteneurs demarres"
 }
 
-# Fonction pour attendre que la base de données soit prête
+# Fonction pour attendre que la base de donnees soit prete
 wait_for_db() {
-    print_info "Attente de la base de données..."
+    print_info "Attente de la base de donnees..."
     sleep 10
-    print_success "Base de données prête ✓"
+    print_success "Base de donnees prete"
 }
 
 # Fonction pour afficher les logs
@@ -118,9 +118,9 @@ show_logs() {
     fi
 }
 
-# Fonction pour afficher l'état des conteneurs
+# Fonction pour afficher l'etat des conteneurs
 show_status() {
-    print_info "État des conteneurs:"
+    print_info "Etat des conteneurs:"
     echo ""
     if docker compose version &> /dev/null; then
         docker compose ps
@@ -133,58 +133,58 @@ show_status() {
 # Fonction pour afficher les informations de connexion
 show_connection_info() {
     echo ""
-    print_success "╔════════════════════════════════════════════════════════════╗"
-    print_success "║         Déploiement terminé avec succès! 🎉               ║"
-    print_success "╚════════════════════════════════════════════════════════════╝"
+    print_success "================================================================"
+    print_success "         Deploiement termine avec succes!"
+    print_success "================================================================"
     echo ""
-    print_info "📱 Application web:"
+    print_info "Application web:"
     echo "   http://localhost        (via Nginx)"
-    echo "   http://localhost:8000   (accès direct Django)"
+    echo "   http://localhost:8000   (acces direct Django)"
     echo ""
-    print_info "👤 Connexion administrateur:"
+    print_info "Connexion administrateur:"
     echo "   Utilisateur: admin"
     echo "   Mot de passe: admin123"
     echo ""
-    print_info "🗄️  Base de données PostgreSQL:"
+    print_info "Base de donnees PostgreSQL:"
     echo "   Host: localhost:5432"
     echo "   Database: kitmanager"
     echo "   User: admin"
-    echo "   Password: repair_password_2024"
+    echo "   Password: P@\$\$W0rd2025"
     echo ""
-    print_info "📋 Commandes utiles:"
+    print_info "Commandes utiles:"
     echo "   docker compose logs -f          # Voir les logs"
-    echo "   docker compose ps               # État des conteneurs"
-    echo "   docker compose stop             # Arrêter les conteneurs"
-    echo "   docker compose down             # Arrêter et supprimer"
-    echo "   docker compose restart          # Redémarrer"
+    echo "   docker compose ps               # Etat des conteneurs"
+    echo "   docker compose stop             # Arreter les conteneurs"
+    echo "   docker compose down             # Arreter et supprimer"
+    echo "   docker compose restart          # Redemarrer"
     echo ""
 }
 
 # Menu principal
 show_menu() {
     echo ""
-    print_info "╔════════════════════════════════════════════════════════════╗"
-    print_info "║     Script de Déploiement - KitManager Docker        ║"
-    print_info "╚════════════════════════════════════════════════════════════╝"
+    print_info "================================================================"
+    print_info "     Script de Deploiement - KitManager Docker"
+    print_info "================================================================"
     echo ""
     echo "Choisissez une option:"
-    echo "  1) Déploiement complet (recommandé)"
-    echo "  2) Déploiement rapide (sans rebuild)"
-    echo "  3) Arrêter les conteneurs"
-    echo "  4) Redémarrer les conteneurs"
+    echo "  1) Deploiement complet (recommande)"
+    echo "  2) Deploiement rapide (sans rebuild)"
+    echo "  3) Arreter les conteneurs"
+    echo "  4) Redemarrer les conteneurs"
     echo "  5) Voir les logs"
-    echo "  6) Voir l'état des conteneurs"
+    echo "  6) Voir l'etat des conteneurs"
     echo "  7) Nettoyer et supprimer tout"
     echo "  0) Quitter"
     echo ""
     read -p "Votre choix: " choice
 }
 
-# Fonction de déploiement complet
+# Fonction de deploiement complet
 full_deployment() {
-    print_info "═══════════════════════════════════════════════════════════"
-    print_info "    DÉPLOIEMENT COMPLET DE REPAIR TRACKER"
-    print_info "═══════════════════════════════════════════════════════════"
+    print_info "================================================================"
+    print_info "    DEPLOIEMENT COMPLET DE KITMANAGER"
+    print_info "================================================================"
     echo ""
 
     check_docker
@@ -196,17 +196,17 @@ full_deployment() {
     show_status
     show_connection_info
 
-    read -p "Voulez-vous voir les logs en temps réel? (y/n): " view_logs
+    read -p "Voulez-vous voir les logs en temps reel? (y/n): " view_logs
     if [ "$view_logs" = "y" ] || [ "$view_logs" = "Y" ]; then
         show_logs
     fi
 }
 
-# Fonction de déploiement rapide
+# Fonction de deploiement rapide
 quick_deployment() {
-    print_info "═══════════════════════════════════════════════════════════"
-    print_info "    DÉPLOIEMENT RAPIDE (sans rebuild)"
-    print_info "═══════════════════════════════════════════════════════════"
+    print_info "================================================================"
+    print_info "    DEPLOIEMENT RAPIDE (sans rebuild)"
+    print_info "================================================================"
     echo ""
 
     check_docker
@@ -216,33 +216,33 @@ quick_deployment() {
     show_connection_info
 }
 
-# Fonction pour arrêter les conteneurs
+# Fonction pour arreter les conteneurs
 stop_containers() {
-    print_info "Arrêt des conteneurs..."
+    print_info "Arret des conteneurs..."
     if docker compose version &> /dev/null; then
         docker compose stop
     else
         docker-compose stop
     fi
-    print_success "Conteneurs arrêtés ✓"
+    print_success "Conteneurs arretes"
 }
 
-# Fonction pour redémarrer les conteneurs
+# Fonction pour redemarrer les conteneurs
 restart_containers() {
-    print_info "Redémarrage des conteneurs..."
+    print_info "Redemarrage des conteneurs..."
     if docker compose version &> /dev/null; then
         docker compose restart
     else
         docker-compose restart
     fi
-    print_success "Conteneurs redémarrés ✓"
+    print_success "Conteneurs redemarres"
     show_status
 }
 
-# Fonction pour nettoyer complètement
+# Fonction pour nettoyer completement
 full_cleanup() {
     print_warning "ATTENTION: Cette action va supprimer tous les conteneurs et volumes!"
-    read -p "Êtes-vous sûr? (y/n): " confirm
+    read -p "Etes-vous sur? (y/n): " confirm
     if [ "$confirm" = "y" ] || [ "$confirm" = "Y" ]; then
         print_info "Nettoyage complet..."
         if docker compose version &> /dev/null; then
@@ -250,9 +250,9 @@ full_cleanup() {
         else
             docker-compose down -v --remove-orphans
         fi
-        print_success "Nettoyage complet terminé ✓"
+        print_success "Nettoyage complet termine"
     else
-        print_info "Opération annulée"
+        print_info "Operation annulee"
     fi
 }
 
@@ -293,10 +293,10 @@ main() {
                     ;;
             esac
             echo ""
-            read -p "Appuyez sur Entrée pour continuer..."
+            read -p "Appuyez sur Entree pour continuer..."
         done
     else
-        # Si des arguments sont fournis, exécuter directement
+        # Si des arguments sont fournis, executer directement
         case $1 in
             deploy|full)
                 full_deployment
@@ -328,5 +328,5 @@ main() {
     fi
 }
 
-# Exécuter le script
+# Executer le script
 main "$@"
