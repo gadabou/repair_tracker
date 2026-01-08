@@ -1,47 +1,56 @@
 {% extends 'base.html' %}
 
-{% block title %}Dashboard - Repair Tracker{% endblock %}
+{% block title %}Dashboard - Integrate Health Equipment Manager{% endblock %}
 
 {% block content %}
-<div class="row">
+<div class="row mb-4">
     <div class="col-12">
-        <h1 class="mb-4">
+        <h1 class="mb-2" style="color: var(--primary-color); font-weight: 700;">
             <i class="bi bi-speedometer2"></i> Tableau de Bord
         </h1>
+        <p class="text-muted">Vue d'ensemble de la gestion des équipements</p>
     </div>
 </div>
 
 <!-- Statistiques globales -->
 <div class="row mb-4">
-    <div class="col-md-3 col-sm-6 mb-3">
-        <div class="card bg-primary text-white">
-            <div class="card-body">
-                <h5 class="card-title">Total Tickets</h5>
-                <h2 class="display-4">{{ total_tickets }}</h2>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="stat-card stat-card-primary">
+            <div style="position: relative; z-index: 1;">
+                <p style="margin: 0; font-size: 0.95rem; opacity: 0.9;">
+                    <i class="bi bi-ticket-perforated"></i> Total Tickets
+                </p>
+                <h3>{{ total_tickets }}</h3>
             </div>
         </div>
     </div>
-    <div class="col-md-3 col-sm-6 mb-3">
-        <div class="card bg-warning text-dark">
-            <div class="card-body">
-                <h5 class="card-title">Ouverts</h5>
-                <h2 class="display-4">{{ open_tickets }}</h2>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="stat-card stat-card-warning">
+            <div style="position: relative; z-index: 1;">
+                <p style="margin: 0; font-size: 0.95rem; opacity: 0.9;">
+                    <i class="bi bi-folder-open"></i> Ouverts
+                </p>
+                <h3>{{ open_tickets }}</h3>
             </div>
         </div>
     </div>
-    <div class="col-md-3 col-sm-6 mb-3">
-        <div class="card bg-info text-white">
-            <div class="card-body">
-                <h5 class="card-title">En cours</h5>
-                <h2 class="display-4">{{ in_progress_tickets }}</h2>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="stat-card stat-card-info">
+            <div style="position: relative; z-index: 1;">
+                <p style="margin: 0; font-size: 0.95rem; opacity: 0.9;">
+                    <i class="bi bi-arrow-repeat"></i> En cours
+                </p>
+                <h3>{{ in_progress_tickets }}</h3>
             </div>
         </div>
     </div>
-    <div class="col-md-3 col-sm-6 mb-3">
-        <div class="card bg-success text-white">
-            <div class="card-body">
-                <h5 class="card-title">Clôturés</h5>
-                <h2 class="display-4">{{ closed_tickets }}</h2>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="stat-card stat-card-success">
+            <div style="position: relative; z-index: 1;">
+                <p style="margin: 0; font-size: 0.95rem; opacity: 0.9;">
+                    <i class="bi bi-check-circle"></i> Clôturés
+                </p>
+                <h3>{{ closed_tickets }}</h3>
             </div>
         </div>
     </div>
@@ -49,33 +58,42 @@
 
 <!-- Indicateurs de délai -->
 <div class="row mb-4">
-    <div class="col-md-4 mb-3">
-        <div class="card border-danger">
-            <div class="card-body">
-                <h5 class="card-title text-danger">
-                    <i class="bi bi-exclamation-triangle-fill"></i> Tickets Rouges (> 14 jours)
-                </h5>
-                <h2 class="display-4">{{ red_count }}</h2>
+    <div class="col-lg-4 col-md-6 mb-3">
+        <div class="stat-card stat-card-danger">
+            <div style="position: relative; z-index: 1;">
+                <p style="margin: 0; font-size: 0.95rem; opacity: 0.9;">
+                    <i class="bi bi-exclamation-triangle-fill"></i> Tickets Rouges
+                </p>
+                <h3>{{ red_count }}</h3>
+                <p style="margin: 0; font-size: 0.85rem; opacity: 0.85;">
+                    Plus de 14 jours
+                </p>
             </div>
         </div>
     </div>
-    <div class="col-md-4 mb-3">
-        <div class="card border-warning">
-            <div class="card-body">
-                <h5 class="card-title text-warning">
-                    <i class="bi bi-exclamation-circle-fill"></i> Tickets Jaunes (8-14 jours)
-                </h5>
-                <h2 class="display-4">{{ yellow_count }}</h2>
+    <div class="col-lg-4 col-md-6 mb-3">
+        <div class="stat-card stat-card-warning">
+            <div style="position: relative; z-index: 1;">
+                <p style="margin: 0; font-size: 0.95rem; opacity: 0.9;">
+                    <i class="bi bi-exclamation-circle-fill"></i> Tickets Jaunes
+                </p>
+                <h3>{{ yellow_count }}</h3>
+                <p style="margin: 0; font-size: 0.85rem; opacity: 0.85;">
+                    8 à 14 jours
+                </p>
             </div>
         </div>
     </div>
-    <div class="col-md-4 mb-3">
-        <div class="card border-success">
-            <div class="card-body">
-                <h5 class="card-title text-success">
-                    <i class="bi bi-check-circle-fill"></i> Tickets Verts (≤ 7 jours)
-                </h5>
-                <h2 class="display-4">{{ green_count }}</h2>
+    <div class="col-lg-4 col-md-12 mb-3">
+        <div class="stat-card stat-card-success">
+            <div style="position: relative; z-index: 1;">
+                <p style="margin: 0; font-size: 0.95rem; opacity: 0.9;">
+                    <i class="bi bi-check-circle-fill"></i> Tickets Verts
+                </p>
+                <h3>{{ green_count }}</h3>
+                <p style="margin: 0; font-size: 0.85rem; opacity: 0.85;">
+                    7 jours ou moins
+                </p>
             </div>
         </div>
     </div>
@@ -83,38 +101,42 @@
 
 <!-- Durée moyenne et top blocages -->
 <div class="row mb-4">
-    <div class="col-md-6 mb-3">
+    <div class="col-lg-6 mb-3">
         <div class="card">
-            <div class="card-header bg-info text-white">
-                <h5 class="mb-0"><i class="bi bi-clock-history"></i> Durée Moyenne de Traitement</h5>
+            <div class="card-header">
+                <h5 class="mb-0 text-white">
+                    <i class="bi bi-clock-history"></i> Durée Moyenne de Traitement
+                </h5>
             </div>
             <div class="card-body text-center">
                 {% if avg_duration %}
-                    <h1 class="display-3">{{ avg_duration }}</h1>
-                    <p class="text-muted">jours en moyenne</p>
+                    <h1 class="display-3" style="color: var(--primary-color); font-weight: 700;">{{ avg_duration }}</h1>
+                    <p class="text-muted" style="font-size: 1.1rem;">jours en moyenne</p>
                 {% else %}
                     <p class="text-muted">Aucune donnée disponible</p>
                 {% endif %}
             </div>
         </div>
     </div>
-    <div class="col-md-6 mb-3">
+    <div class="col-lg-6 mb-3">
         <div class="card">
-            <div class="card-header bg-danger text-white">
-                <h5 class="mb-0"><i class="bi bi-graph-up"></i> Top 5 des Points de Blocage</h5>
+            <div class="card-header bg-danger">
+                <h5 class="mb-0 text-white">
+                    <i class="bi bi-graph-up"></i> Top 5 des Points de Blocage
+                </h5>
             </div>
             <div class="card-body">
                 {% if top_blockages %}
-                    <ul class="list-group">
+                    <ul class="list-group list-group-flush">
                         {% for stage, count in top_blockages %}
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            {{ stage }}
-                            <span class="badge bg-danger rounded-pill">{{ count }}</span>
+                        <li class="list-group-item d-flex justify-content-between align-items-center" style="border: none; padding: 0.75rem 0;">
+                            <span style="font-weight: 500;">{{ stage }}</span>
+                            <span class="badge" style="background: var(--accent-color); font-size: 0.95rem; padding: 0.5rem 1rem;">{{ count }}</span>
                         </li>
                         {% endfor %}
                     </ul>
                 {% else %}
-                    <p class="text-muted">Aucun blocage détecté</p>
+                    <p class="text-muted text-center mb-0">Aucun blocage détecté</p>
                 {% endif %}
             </div>
         </div>
@@ -125,8 +147,10 @@
 <div class="row mb-4">
     <div class="col-12">
         <div class="card">
-            <div class="card-header bg-dark text-white">
-                <h5 class="mb-0"><i class="bi bi-list-ul"></i> Tickets Rouges Récents</h5>
+            <div class="card-header">
+                <h5 class="mb-0 text-white">
+                    <i class="bi bi-list-ul"></i> Tickets Rouges Récents - Action Urgente Requise
+                </h5>
             </div>
             <div class="card-body">
                 {% if recent_red_tickets %}
@@ -134,30 +158,37 @@
                         <table class="table table-hover">
                             <thead>
                                 <tr>
-                                    <th>Numéro</th>
-                                    <th>Équipement</th>
-                                    <th>ASC</th>
-                                    <th>Étape actuelle</th>
-                                    <th>Délai</th>
-                                    <th>Priorité</th>
+                                    <th><i class="bi bi-hash"></i> Numéro</th>
+                                    <th><i class="bi bi-phone"></i> Équipement</th>
+                                    <th><i class="bi bi-person"></i> ASC</th>
+                                    <th><i class="bi bi-diagram-3"></i> Étape actuelle</th>
+                                    <th><i class="bi bi-clock"></i> Délai</th>
+                                    <th><i class="bi bi-flag"></i> Priorité</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for ticket in recent_red_tickets %}
-                                <tr>
-                                    <td><a href="{% url 'tickets:detail' ticket.pk %}">{{ ticket.ticket_number }}</a></td>
+                                <tr style="cursor: pointer;" onclick="window.location.href='{% url 'tickets:detail' ticket.pk %}';">
+                                    <td>
+                                        <a href="{% url 'tickets:detail' ticket.pk %}" style="color: var(--primary-color); font-weight: 600; text-decoration: none;">
+                                            {{ ticket.ticket_number }}
+                                        </a>
+                                    </td>
                                     <td>{{ ticket.equipment }}</td>
                                     <td>{{ ticket.asc.get_full_name }}</td>
-                                    <td>{{ ticket.get_current_stage_display }}</td>
+                                    <td><span class="badge bg-secondary">{{ ticket.get_current_stage_display }}</span></td>
                                     <td><span class="badge bg-{{ ticket.get_delay_color }}">{{ ticket.get_delay_days }} jours</span></td>
-                                    <td><span class="badge bg-secondary">{{ ticket.get_priority_display }}</span></td>
+                                    <td><span class="badge" style="background: var(--tertiary-color);">{{ ticket.get_priority_display }}</span></td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
                         </table>
                     </div>
                 {% else %}
-                    <p class="text-muted">Aucun ticket rouge</p>
+                    <div class="text-center py-4">
+                        <i class="bi bi-check-circle" style="font-size: 3rem; color: var(--tertiary-color);"></i>
+                        <p class="text-muted mt-2">Aucun ticket rouge - Excellent travail !</p>
+                    </div>
                 {% endif %}
             </div>
         </div>
@@ -166,23 +197,70 @@
 
 <!-- Autres statistiques -->
 <div class="row">
-    <div class="col-md-6 mb-3">
+    <div class="col-lg-6 mb-3">
         <div class="card">
             <div class="card-header">
-                <h5 class="mb-0"><i class="bi bi-people"></i> ASCs Actifs</h5>
+                <h5 class="mb-0 text-white">
+                    <i class="bi bi-people"></i> ASCs Actifs
+                </h5>
             </div>
             <div class="card-body text-center">
-                <h2 class="display-4">{{ total_ascs }}</h2>
+                <h2 class="display-4" style="color: var(--primary-color); font-weight: 700;">{{ total_ascs }}</h2>
+                <p class="text-muted">Agents de santé communautaire</p>
             </div>
         </div>
     </div>
-    <div class="col-md-6 mb-3">
+    <div class="col-lg-6 mb-3">
         <div class="card">
             <div class="card-header">
-                <h5 class="mb-0"><i class="bi bi-phone"></i> Équipements Totaux</h5>
+                <h5 class="mb-0 text-white">
+                    <i class="bi bi-phone"></i> Équipements Totaux
+                </h5>
             </div>
             <div class="card-body text-center">
-                <h2 class="display-4">{{ total_equipment }}</h2>
+                <h2 class="display-4" style="color: var(--primary-color); font-weight: 700;">{{ total_equipment }}</h2>
+                <p class="text-muted">Appareils enregistrés</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0 text-white">
+                    <i class="bi bi-lightning-fill"></i> Actions Rapides
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <a href="{% url 'tickets:create' %}" class="btn btn-primary w-100 py-3">
+                            <i class="bi bi-plus-circle"></i><br>
+                            <span style="font-size: 0.95rem;">Créer un Ticket</span>
+                        </a>
+                    </div>
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <a href="{% url 'tickets:list' %}" class="btn btn-info w-100 py-3">
+                            <i class="bi bi-list-ul"></i><br>
+                            <span style="font-size: 0.95rem;">Voir Tous les Tickets</span>
+                        </a>
+                    </div>
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <a href="{% url 'assets:list' %}" class="btn btn-success w-100 py-3">
+                            <i class="bi bi-phone"></i><br>
+                            <span style="font-size: 0.95rem;">Gérer Équipements</span>
+                        </a>
+                    </div>
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <a href="{% url 'accounts:asc_list' %}" class="btn btn-secondary w-100 py-3">
+                            <i class="bi bi-people"></i><br>
+                            <span style="font-size: 0.95rem;">Gérer ASCs</span>
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

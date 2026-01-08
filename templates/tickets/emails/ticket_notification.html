@@ -3,115 +3,405 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Notification Repair Tracker</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Notification - Integrate Health Equipment Manager</title>
     <style>
+        /* Reset Styles */
+        body, table, td, a {
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+        }
+        table, td {
+            mso-table-lspace: 0pt;
+            mso-table-rspace: 0pt;
+        }
+        img {
+            -ms-interpolation-mode: bicubic;
+            border: 0;
+            height: auto;
+            line-height: 100%;
+            outline: none;
+            text-decoration: none;
+        }
+
+        /* Base Styles */
         body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            color: #333;
+            margin: 0;
+            padding: 0;
+            width: 100% !important;
+            height: 100% !important;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        /* Color Variables */
+        :root {
+            --primary-color: #0B588d;
+            --secondary-color: #d1d73f;
+            --tertiary-color: #27a5de;
+            --accent-color: #e92656;
+        }
+
+        /* Container Styles */
+        .email-container {
             max-width: 600px;
             margin: 0 auto;
-            padding: 20px;
+            background-color: #ffffff;
         }
-        .header {
-            background-color: #0d6efd;
-            color: white;
-            padding: 20px;
+
+        /* Header Styles */
+        .email-header {
+            background: linear-gradient(135deg, #0B588d 0%, #27a5de 100%);
+            padding: 30px 20px;
             text-align: center;
-            border-radius: 5px 5px 0 0;
         }
-        .content {
-            background-color: #f8f9fa;
+
+        .email-header img {
+            max-width: 200px;
+            height: auto;
+            margin-bottom: 15px;
+        }
+
+        .email-header h1 {
+            color: #ffffff;
+            font-size: 24px;
+            font-weight: 700;
+            margin: 10px 0 5px 0;
+        }
+
+        .email-header p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 14px;
+            margin: 0;
+        }
+
+        /* Content Styles */
+        .email-content {
+            padding: 30px 25px;
+            background-color: #ffffff;
+        }
+
+        .greeting {
+            font-size: 18px;
+            font-weight: 600;
+            color: #0B588d;
+            margin-bottom: 15px;
+        }
+
+        .intro-text {
+            font-size: 15px;
+            color: #333333;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        /* Info Box Styles */
+        .info-box {
+            background: linear-gradient(135deg, rgba(11, 88, 141, 0.05) 0%, rgba(39, 165, 222, 0.05) 100%);
+            border-left: 4px solid #0B588d;
+            border-radius: 8px;
             padding: 20px;
-            border: 1px solid #dee2e6;
-        }
-        .ticket-info {
-            background-color: white;
-            padding: 15px;
-            margin: 15px 0;
-            border-left: 4px solid #0d6efd;
-            border-radius: 3px;
-        }
-        .ticket-info strong {
-            color: #0d6efd;
-        }
-        .button {
-            display: inline-block;
-            background-color: #0d6efd;
-            color: white;
-            padding: 12px 30px;
-            text-decoration: none;
-            border-radius: 5px;
             margin: 20px 0;
         }
-        .footer {
-            text-align: center;
-            padding: 20px;
-            font-size: 12px;
-            color: #6c757d;
-            border-top: 1px solid #dee2e6;
-            margin-top: 20px;
+
+        .info-box h3 {
+            color: #0B588d;
+            font-size: 16px;
+            font-weight: 700;
+            margin: 0 0 15px 0;
+            display: flex;
+            align-items: center;
         }
+
+        .info-box h3::before {
+            content: "📋";
+            margin-right: 8px;
+            font-size: 18px;
+        }
+
+        .info-row {
+            margin: 10px 0;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .info-row strong {
+            color: #0B588d;
+            font-weight: 600;
+            display: inline-block;
+            min-width: 180px;
+        }
+
+        .info-row span {
+            color: #333333;
+        }
+
+        /* Problem Box */
+        .problem-box {
+            background: linear-gradient(135deg, rgba(39, 165, 222, 0.05) 0%, rgba(209, 215, 63, 0.05) 100%);
+            border-left: 4px solid #27a5de;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .problem-box h3 {
+            color: #27a5de;
+            font-size: 16px;
+            font-weight: 700;
+            margin: 0 0 10px 0;
+        }
+
+        .problem-box h3::before {
+            content: "🔍";
+            margin-right: 8px;
+        }
+
+        .problem-box p {
+            color: #333333;
+            font-size: 14px;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        /* Comment Box */
         .comment-box {
-            background-color: #fff3cd;
-            border-left: 4px solid #ffc107;
-            padding: 10px;
-            margin: 15px 0;
-            border-radius: 3px;
+            background: linear-gradient(135deg, rgba(209, 215, 63, 0.1) 0%, rgba(184, 191, 18, 0.1) 100%);
+            border-left: 4px solid #d1d73f;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .comment-box h4 {
+            color: #b8bf12;
+            font-size: 15px;
+            font-weight: 700;
+            margin: 0 0 10px 0;
+        }
+
+        .comment-box h4::before {
+            content: "💬";
+            margin-right: 8px;
+        }
+
+        .comment-box p {
+            color: #333333;
+            font-size: 14px;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        /* Button Styles */
+        .button-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .button {
+            display: inline-block;
+            background: linear-gradient(135deg, #0B588d 0%, #27a5de 100%);
+            color: #ffffff !important;
+            text-decoration: none;
+            padding: 15px 40px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            box-shadow: 0 4px 12px rgba(11, 88, 141, 0.25);
+            transition: all 0.3s ease;
+        }
+
+        .button:hover {
+            box-shadow: 0 6px 16px rgba(11, 88, 141, 0.35);
+            transform: translateY(-2px);
+        }
+
+        /* Action Required Box */
+        .action-box {
+            background: linear-gradient(135deg, rgba(233, 38, 86, 0.05) 0%, rgba(196, 30, 71, 0.05) 100%);
+            border: 2px solid #e92656;
+            border-radius: 8px;
+            padding: 15px 20px;
+            margin: 25px 0;
+            text-align: center;
+        }
+
+        .action-box p {
+            color: #e92656;
+            font-size: 14px;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .action-box p::before {
+            content: "⚠️";
+            margin-right: 8px;
+        }
+
+        /* Footer Styles */
+        .email-footer {
+            background: linear-gradient(135deg, #0B588d 0%, #000000 100%);
+            color: rgba(255, 255, 255, 0.8);
+            padding: 25px 20px;
+            text-align: center;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .email-footer p {
+            margin: 5px 0;
+        }
+
+        .email-footer strong {
+            color: #ffffff;
+            font-weight: 700;
+        }
+
+        /* Responsive Styles */
+        @media screen and (max-width: 600px) {
+            .email-container {
+                width: 100% !important;
+            }
+
+            .email-header {
+                padding: 25px 15px;
+            }
+
+            .email-header h1 {
+                font-size: 20px;
+            }
+
+            .email-header img {
+                max-width: 160px;
+            }
+
+            .email-content {
+                padding: 20px 15px;
+            }
+
+            .info-box,
+            .problem-box,
+            .comment-box {
+                padding: 15px;
+            }
+
+            .info-row strong {
+                display: block;
+                min-width: auto;
+                margin-bottom: 3px;
+            }
+
+            .button {
+                padding: 12px 30px;
+                font-size: 14px;
+            }
+
+            .email-footer {
+                padding: 20px 15px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>IH Equipment Manager</h1>
-        <p>Notification de Ticket</p>
-    </div>
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #f8f9fa; padding: 20px 0;">
+        <tr>
+            <td align="center">
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" class="email-container">
+                    <!-- Header -->
+                    <tr>
+                        <td class="email-header">
+                            <img src="cid:logo" alt="Integrate Health" style="max-width: 200px; height: auto;">
+                            <h1>Equipment Manager</h1>
+                            <p>Notification de Ticket</p>
+                        </td>
+                    </tr>
 
-    <div class="content">
-        <h2>Bonjour{% if recipient %} {{ recipient.get_full_name }}{% endif %},</h2>
+                    <!-- Content -->
+                    <tr>
+                        <td class="email-content">
+                            <p class="greeting">Bonjour{% if recipient %} {{ recipient.get_full_name }}{% endif %},</p>
 
-        <p>Vous avez reçu un nouveau ticket à traiter dans le système Repair Tracker.</p>
+                            <p class="intro-text">
+                                Vous avez reçu un nouveau ticket à traiter dans le système <strong>Equipment Manager</strong> d'Integrate Health.
+                            </p>
 
-        <div class="ticket-info">
-            <h3>📋 Informations du Ticket</h3>
-            <p><strong>Numéro :</strong> {{ ticket.ticket_number }}</p>
-            <p><strong>Équipement :</strong> {{ ticket.equipment.brand }} {{ ticket.equipment.model }} ({{ ticket.equipment.imei }})</p>
-            <p><strong>ASC :</strong> {{ ticket.asc.get_full_name }} ({{ ticket.asc.code }})</p>
-            {% if ticket.asc.site %}
-            <p><strong>Site :</strong> {{ ticket.asc.site.name }}</p>
-            {% endif %}
-            <p><strong>Département destinataire :</strong> {{ to_role_display }}</p>
-            <p><strong>Envoyé par :</strong> {{ sender.get_full_name }} ({{ sender.get_role_display }})</p>
-            <p><strong>Date d'envoi :</strong> {{ ticket.updated_at|date:"d/m/Y à H:i" }}</p>
-        </div>
+                            <!-- Ticket Information -->
+                            <div class="info-box">
+                                <h3>Informations du Ticket</h3>
+                                <div class="info-row">
+                                    <strong>Numéro :</strong>
+                                    <span>{{ ticket.ticket_number }}</span>
+                                </div>
+                                <div class="info-row">
+                                    <strong>Équipement :</strong>
+                                    <span>{{ ticket.equipment.brand }} {{ ticket.equipment.model }} ({{ ticket.equipment.imei }})</span>
+                                </div>
+                                <div class="info-row">
+                                    <strong>ASC :</strong>
+                                    <span>{{ ticket.asc.get_full_name }} ({{ ticket.asc.code }})</span>
+                                </div>
+                                {% if ticket.asc.site %}
+                                <div class="info-row">
+                                    <strong>Site :</strong>
+                                    <span>{{ ticket.asc.site.name }}</span>
+                                </div>
+                                {% endif %}
+                                <div class="info-row">
+                                    <strong>Département destinataire :</strong>
+                                    <span>{{ to_role_display }}</span>
+                                </div>
+                                <div class="info-row">
+                                    <strong>Envoyé par :</strong>
+                                    <span>{{ sender.get_full_name }} ({{ sender.get_role_display }})</span>
+                                </div>
+                                <div class="info-row">
+                                    <strong>Date d'envoi :</strong>
+                                    <span>{{ ticket.updated_at|date:"d/m/Y à H:i" }}</span>
+                                </div>
+                            </div>
 
-        {% if ticket.initial_problem_description %}
-        <div class="ticket-info">
-            <h3>🔍 Description du problème</h3>
-            <p>{{ ticket.initial_problem_description }}</p>
-        </div>
-        {% endif %}
+                            <!-- Problem Description -->
+                            {% if ticket.initial_problem_description %}
+                            <div class="problem-box">
+                                <h3>Description du problème</h3>
+                                <p>{{ ticket.initial_problem_description }}</p>
+                            </div>
+                            {% endif %}
 
-        {% if comment %}
-        <div class="comment-box">
-            <h4>💬 Commentaire</h4>
-            <p>{{ comment }}</p>
-        </div>
-        {% endif %}
+                            <!-- Comment -->
+                            {% if comment %}
+                            <div class="comment-box">
+                                <h4>Commentaire</h4>
+                                <p>{{ comment }}</p>
+                            </div>
+                            {% endif %}
 
-        <div style="text-align: center;">
-            <a href="{{ ticket_url }}" class="button">Voir le Ticket</a>
-        </div>
+                            <!-- Button -->
+                            <div class="button-container">
+                                <a href="{{ ticket_url }}" class="button">
+                                    📥 Confirmer la Réception
+                                </a>
+                            </div>
 
-        <p style="margin-top: 20px;">
-            <strong>Action requise :</strong> Veuillez consulter ce ticket et effectuer les actions nécessaires dans le système.
-        </p>
-    </div>
+                            <!-- Action Required -->
+                            <div class="action-box">
+                                <p>Action requise : Veuillez confirmer la réception et traiter ce ticket rapidement</p>
+                            </div>
+                        </td>
+                    </tr>
 
-    <div class="footer">
-        <p>Cet email a été envoyé automatiquement par Repair Tracker.</p>
-        <p>Suivi des réparations d'équipements ASC © 2025</p>
-        <p>Pour toute question, veuillez contacter votre administrateur système.</p>
-    </div>
+                    <!-- Footer -->
+                    <tr>
+                        <td class="email-footer">
+                            <p><strong>Integrate Health</strong> © 2025</p>
+                            <p>Equipment Manager - Suivi des réparations d'équipements ASC</p>
+                            <p>Cet email a été envoyé automatiquement. Ne pas répondre à cet email.</p>
+                            <p>Pour toute question, veuillez contacter votre administrateur système.</p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
 </body>
 </html>

@@ -1,0 +1,646 @@
+/* ==========================================
+   INTEGRATE HEALTH - REPAIR TRACKER
+   Custom Styles - Modern Professional Design
+   ========================================== */
+
+:root {
+    /* Color Palette */
+    --primary-color: #0B588d;
+    --secondary-color: #d1d73f;
+    --tertiary-color: #27a5de;
+    --accent-color: #e92656;
+    --neutral-color: #000000;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, var(--primary-color) 0%, var(--tertiary-color) 100%);
+    --gradient-secondary: linear-gradient(135deg, var(--secondary-color) 0%, #b8bf12 100%);
+
+    /* Shadows */
+    --shadow-sm: 0 2px 4px rgba(11, 88, 141, 0.1);
+    --shadow-md: 0 4px 12px rgba(11, 88, 141, 0.15);
+    --shadow-lg: 0 8px 24px rgba(11, 88, 141, 0.2);
+
+    /* Spacing */
+    --header-height: 70px;
+}
+
+/* ==========================================
+   GLOBAL STYLES
+   ========================================== */
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f8f9fa;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.container-fluid {
+    flex: 1;
+}
+
+/* ==========================================
+   NAVBAR STYLES
+   ========================================== */
+
+.navbar {
+    background: var(--gradient-primary) !important;
+    box-shadow: var(--shadow-md);
+    min-height: var(--header-height);
+    padding: 0.5rem 1rem;
+}
+
+.navbar-brand {
+    font-size: 1.5rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: white !important;
+    transition: all 0.3s ease;
+}
+
+.navbar-brand:hover {
+    transform: translateY(-2px);
+}
+
+.navbar-brand img {
+    height: 50px;
+    width: auto;
+}
+
+.navbar-nav .nav-link {
+    color: rgba(255, 255, 255, 0.9) !important;
+    font-weight: 500;
+    padding: 0.5rem 1rem !important;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    margin: 0 0.25rem;
+}
+
+.navbar-nav .nav-link:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: white !important;
+    transform: translateY(-1px);
+}
+
+.navbar-nav .nav-link i {
+    margin-right: 0.5rem;
+}
+
+.dropdown-menu {
+    border: none;
+    box-shadow: var(--shadow-lg);
+    border-radius: 12px;
+    padding: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.dropdown-item {
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    transition: all 0.2s ease;
+}
+
+.dropdown-item:hover {
+    background: var(--tertiary-color);
+    color: white;
+}
+
+/* Logout button in dropdown */
+.dropdown-item[type="submit"] {
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+}
+
+.dropdown-item[type="submit"]:hover {
+    background: var(--tertiary-color);
+    color: white;
+}
+
+/* ==========================================
+   CARD STYLES
+   ========================================== */
+
+.card {
+    border: none;
+    border-radius: 16px;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.card-header {
+    background: var(--gradient-primary);
+    border: none;
+    padding: 1.25rem 1.5rem;
+    font-weight: 600;
+}
+
+.card-header.bg-primary {
+    background: var(--gradient-primary) !important;
+}
+
+.card-header.bg-success {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
+}
+
+.card-header.bg-info {
+    background: linear-gradient(135deg, var(--tertiary-color) 0%, var(--primary-color) 100%) !important;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+/* ==========================================
+   BUTTON STYLES
+   ========================================== */
+
+.btn {
+    border-radius: 10px;
+    padding: 0.625rem 1.5rem;
+    font-weight: 600;
+    border: none;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-sm);
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-primary {
+    background: var(--gradient-primary);
+    color: white;
+}
+
+.btn-primary:hover {
+    opacity: 0.9;
+    color: white;
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+}
+
+.btn-warning {
+    background: linear-gradient(135deg, var(--secondary-color) 0%, #b8bf12 100%);
+    color: var(--neutral-color);
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, var(--accent-color) 0%, #c41e47 100%);
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+}
+
+.btn-info {
+    background: linear-gradient(135deg, var(--tertiary-color) 0%, #17a2b8 100%);
+}
+
+/* ==========================================
+   BADGE STYLES
+   ========================================== */
+
+.badge {
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.badge.bg-primary {
+    background: var(--primary-color) !important;
+}
+
+.badge.bg-secondary {
+    background: var(--secondary-color) !important;
+    color: var(--neutral-color) !important;
+}
+
+.badge.bg-success {
+    background: #28a745 !important;
+}
+
+.badge.bg-warning {
+    background: var(--secondary-color) !important;
+    color: var(--neutral-color) !important;
+}
+
+.badge.bg-danger {
+    background: var(--accent-color) !important;
+}
+
+.badge.bg-info {
+    background: var(--tertiary-color) !important;
+}
+
+/* ==========================================
+   ALERT STYLES
+   ========================================== */
+
+.alert {
+    border: none;
+    border-radius: 12px;
+    box-shadow: var(--shadow-sm);
+    padding: 1rem 1.25rem;
+}
+
+.alert-success {
+    background: linear-gradient(135deg, rgba(40, 167, 69, 0.1) 0%, rgba(32, 201, 151, 0.1) 100%);
+    border-left: 4px solid #28a745;
+}
+
+.alert-warning {
+    background: linear-gradient(135deg, rgba(209, 215, 63, 0.1) 0%, rgba(184, 191, 18, 0.1) 100%);
+    border-left: 4px solid var(--secondary-color);
+}
+
+.alert-danger {
+    background: linear-gradient(135deg, rgba(233, 38, 86, 0.1) 0%, rgba(196, 30, 71, 0.1) 100%);
+    border-left: 4px solid var(--accent-color);
+}
+
+.alert-info {
+    background: linear-gradient(135deg, rgba(39, 165, 222, 0.1) 0%, rgba(23, 162, 184, 0.1) 100%);
+    border-left: 4px solid var(--tertiary-color);
+}
+
+/* ==========================================
+   TABLE STYLES
+   ========================================== */
+
+.table {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.table thead th {
+    background: var(--primary-color);
+    color: white;
+    font-weight: 600;
+    border: none;
+    padding: 1rem;
+}
+
+.table tbody tr {
+    transition: all 0.2s ease;
+}
+
+.table tbody tr:hover {
+    background: rgba(11, 88, 141, 0.05);
+}
+
+.table-active {
+    background: rgba(39, 165, 222, 0.1) !important;
+}
+
+/* ==========================================
+   FORM STYLES
+   ========================================== */
+
+.form-control,
+.form-select {
+    border-radius: 10px;
+    border: 2px solid #e9ecef;
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--tertiary-color);
+    box-shadow: 0 0 0 0.2rem rgba(39, 165, 222, 0.15);
+}
+
+.form-label {
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+/* ==========================================
+   FOOTER STYLES
+   ========================================== */
+
+footer {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--neutral-color) 100%);
+    color: white;
+    padding: 2rem 0;
+    margin-top: auto;
+}
+
+footer p {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* ==========================================
+   TIMELINE STYLES
+   ========================================== */
+
+.timeline-item {
+    border-left: 3px solid var(--tertiary-color);
+    padding-left: 1.5rem;
+    padding-bottom: 1.5rem;
+    position: relative;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -7px;
+    top: 0;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--tertiary-color);
+}
+
+.timeline-item:last-child {
+    padding-bottom: 0;
+}
+
+/* ==========================================
+   DASHBOARD STATS CARDS
+   ========================================== */
+
+.stat-card {
+    border-radius: 16px;
+    padding: 1.5rem;
+    color: white;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+}
+
+.stat-card-primary {
+    background: var(--gradient-primary);
+}
+
+.stat-card-success {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+}
+
+.stat-card-warning {
+    background: var(--gradient-secondary);
+    color: var(--neutral-color) !important;
+}
+
+.stat-card-danger {
+    background: linear-gradient(135deg, var(--accent-color) 0%, #c41e47 100%);
+}
+
+.stat-card-info {
+    background: linear-gradient(135deg, var(--tertiary-color) 0%, #17a2b8 100%);
+}
+
+.stat-card h3 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.stat-card p {
+    margin: 0.5rem 0 0 0;
+    opacity: 0.9;
+    font-size: 1rem;
+}
+
+/* ==========================================
+   LOGIN PAGE STYLES
+   ========================================== */
+
+.login-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--gradient-primary);
+    padding: 2rem;
+}
+
+.login-card {
+    max-width: 450px;
+    width: 100%;
+    background: white;
+    border-radius: 24px;
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+}
+
+.login-header {
+    background: var(--gradient-primary);
+    padding: 2.5rem 2rem;
+    text-align: center;
+    color: white;
+}
+
+.login-logo {
+    max-width: 200px;
+    height: auto;
+    margin-bottom: 1rem;
+}
+
+.login-header h2 {
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    font-size: 1.75rem;
+}
+
+.login-header p {
+    margin: 0;
+    opacity: 0.9;
+    font-size: 0.95rem;
+}
+
+.login-body {
+    padding: 2.5rem 2rem;
+}
+
+/* ==========================================
+   RESPONSIVE DESIGN
+   ========================================== */
+
+/* Tablets (768px - 991px) */
+@media (max-width: 991px) {
+    .navbar-brand {
+        font-size: 1.25rem;
+    }
+
+    .navbar-brand img {
+        height: 40px;
+    }
+
+    .card-body {
+        padding: 1.25rem;
+    }
+
+    .stat-card h3 {
+        font-size: 2rem;
+    }
+}
+
+/* Mobile Phones (< 768px) */
+@media (max-width: 767px) {
+    :root {
+        --header-height: 60px;
+    }
+
+    .navbar {
+        min-height: auto;
+        padding: 0.5rem;
+    }
+
+    .navbar-brand {
+        font-size: 1.125rem;
+    }
+
+    .navbar-brand img {
+        height: 35px;
+    }
+
+    .navbar-nav .nav-link {
+        padding: 0.5rem !important;
+        margin: 0.25rem 0;
+    }
+
+    .card {
+        border-radius: 12px;
+        margin-bottom: 1rem;
+    }
+
+    .card-header {
+        padding: 1rem;
+        font-size: 0.95rem;
+    }
+
+    .card-body {
+        padding: 1rem;
+    }
+
+    .btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .stat-card {
+        padding: 1.25rem;
+    }
+
+    .stat-card h3 {
+        font-size: 1.75rem;
+    }
+
+    .stat-card p {
+        font-size: 0.9rem;
+    }
+
+    .table {
+        font-size: 0.875rem;
+    }
+
+    .table thead th,
+    .table tbody td {
+        padding: 0.75rem 0.5rem;
+    }
+
+    .login-card {
+        border-radius: 16px;
+    }
+
+    .login-header {
+        padding: 2rem 1.5rem;
+    }
+
+    .login-logo {
+        max-width: 160px;
+    }
+
+    .login-body {
+        padding: 2rem 1.5rem;
+    }
+
+    footer {
+        padding: 1.5rem 0;
+        font-size: 0.875rem;
+    }
+}
+
+/* Small Mobile Phones (< 576px) */
+@media (max-width: 575px) {
+    .container-fluid {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+    }
+
+    .navbar-brand img {
+        height: 30px;
+    }
+
+    h1 {
+        font-size: 1.5rem;
+    }
+
+    h2 {
+        font-size: 1.35rem;
+    }
+
+    h3 {
+        font-size: 1.2rem;
+    }
+
+    .badge {
+        font-size: 0.75rem;
+        padding: 0.375rem 0.75rem;
+    }
+
+    .btn-group-vertical .btn {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+}
+
+/* ==========================================
+   PRINT STYLES
+   ========================================== */
+
+@media print {
+    .navbar,
+    footer,
+    .btn,
+    .alert {
+        display: none !important;
+    }
+
+    .card {
+        box-shadow: none;
+        border: 1px solid #dee2e6;
+    }
+}

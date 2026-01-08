@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Repair Tracker{% endblock %}</title>
+    <title>{% block title %}Integrate Health - Equipment Manager{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/custom.css' %}">
     {% block extra_css %}{% endblock %}
 </head>
 <body>
@@ -13,7 +15,8 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container-fluid">
             <a class="navbar-brand" href="{% url 'dashboard:home' %}">
-                <i class="bi bi-tools"></i> Repair Tracker
+                <img src="{% static 'img/logo.png' %}" alt="Integrate Health">
+                <span>Equipment Manager</span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -58,7 +61,14 @@
                             <li><span class="dropdown-item-text small">{{ user.get_role_display }}</span></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="/admin/"><i class="bi bi-gear"></i> Admin</a></li>
-                            <li><a class="dropdown-item" href="{% url 'logout' %}"><i class="bi bi-box-arrow-right"></i> Déconnexion</a></li>
+                            <li>
+                                <form method="post" action="{% url 'logout' %}" style="margin: 0;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="dropdown-item" style="border: none; background: none; width: 100%; text-align: left; cursor: pointer;">
+                                        <i class="bi bi-box-arrow-right"></i> Déconnexion
+                                    </button>
+                                </form>
+                            </li>
                         </ul>
                     </li>
                 </ul>
@@ -85,10 +95,10 @@
     </div>
 
     <!-- Footer -->
-    <footer class="mt-5 py-3 bg-light text-center">
+    <footer class="mt-5 py-3 text-center">
         <div class="container">
-            <p class="text-muted mb-0">
-                Repair Tracker © 2025 - Suivi des réparations d'équipements ASC
+            <p class="mb-0">
+                <strong>Integrate Health</strong> © 2025 - Equipment Manager - Suivi des réparations d'équipements ASC
             </p>
         </div>
     </footer>
