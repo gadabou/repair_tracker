@@ -1,6 +1,6 @@
-# Repair Tracker - Système de Suivi de Réparations d'Équipements ASC
+# KitManager - Système de Gestion d'Équipements ASC
 
-Application Django complète pour tracer l'acheminement des téléphones/équipements des Agents de Santé Communautaire (ASC) envoyés en réparation.
+Application Django complète pour la gestion et le suivi des équipements des Agents de Santé Communautaire (ASC).
 
 ## Fonctionnalités Principales
 
@@ -77,7 +77,7 @@ API complète avec Django REST Framework :
 
 ```bash
 # 1. Cloner ou naviguer vers le projet
-cd /path/to/repair_tracker
+cd /path/to/kitmanager
 
 # 2. Installer les dépendances
 pip install -r requirements.txt
@@ -114,7 +114,7 @@ Les comptes suivants sont créés automatiquement par `seed_demo` :
 ## Structure du Projet
 
 ```
-repair_tracker/
+kitmanager/
 ├── config/                 # Configuration Django
 │   ├── settings.py
 │   ├── urls.py
@@ -268,7 +268,7 @@ SECRET_KEY = 'votre-clé-secrète-forte'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'repair_tracker',
+        'NAME': 'kitmanager',
         'USER': 'your_user',
         'PASSWORD': 'your_password',
         'HOST': 'localhost',

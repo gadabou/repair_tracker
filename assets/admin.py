@@ -11,9 +11,9 @@ class EquipmentHistoryInline(admin.TabularInline):
 
 @admin.register(Equipment)
 class EquipmentAdmin(admin.ModelAdmin):
-    list_display = ['imei', 'equipment_type', 'brand', 'model', 'owner', 'status', 'created_at']
+    list_display = ['imei', 'equipment_type', 'brand', 'model', 'owner', 'employee', 'status', 'created_at']
     list_filter = ['equipment_type', 'status', 'brand']
-    search_fields = ['imei', 'serial_number', 'brand', 'model', 'owner__first_name', 'owner__last_name']
+    search_fields = ['imei', 'serial_number', 'brand', 'model', 'owner__first_name', 'owner__last_name', 'employee__first_name', 'employee__last_name', 'employee__employee_id']
     ordering = ['-created_at']
     inlines = [EquipmentHistoryInline]
 
@@ -22,7 +22,7 @@ class EquipmentAdmin(admin.ModelAdmin):
             'fields': ('equipment_type', 'brand', 'model', 'imei', 'serial_number')
         }),
         ('Propriétaire', {
-            'fields': ('owner',)
+            'fields': ('owner', 'employee')
         }),
         ('Statut', {
             'fields': ('status',)

@@ -1,6 +1,6 @@
-q# 🐳 Déploiement Docker - Repair Tracker
+q# 🐳 Déploiement Docker - KitManager
 
-Ce guide explique comment déployer l'application Repair Tracker avec Docker.
+Ce guide explique comment déployer l'application KitManager avec Docker.
 
 ## 📋 Prérequis
 
@@ -49,9 +49,9 @@ DEBUG=False
 SECRET_KEY=votre-clé-secrète-ultra-sécurisée
 ALLOWED_HOSTS=localhost,127.0.0.1,votre-domaine.com
 
-DATABASE_URL=postgresql://repair_user:repair_password_2024@db:5432/repair_tracker
+DATABASE_URL=postgresql://repair_user:repair_password_2024@db:5432/kitmanager
 
-POSTGRES_DB=repair_tracker
+POSTGRES_DB=kitmanager
 POSTGRES_USER=repair_user
 POSTGRES_PASSWORD=repair_password_2024
 ```
@@ -157,13 +157,13 @@ docker-compose exec web bash
 
 ```bash
 # Accéder à PostgreSQL
-docker-compose exec db psql -U repair_user -d repair_tracker
+docker-compose exec db psql -U repair_user -d kitmanager
 
 # Backup de la base de données
-docker-compose exec db pg_dump -U repair_user repair_tracker > backup.sql
+docker-compose exec db pg_dump -U repair_user kitmanager > backup.sql
 
 # Restaurer la base de données
-docker-compose exec -T db psql -U repair_user repair_tracker < backup.sql
+docker-compose exec -T db psql -U repair_user kitmanager < backup.sql
 ```
 
 ## 📊 Volumes Docker
@@ -178,11 +178,11 @@ Les volumes suivants sont créés pour la persistance des données:
 
 ```bash
 # Backup du volume PostgreSQL
-docker run --rm -v repair_tracker_postgres_data:/data -v $(pwd):/backup \
+docker run --rm -v kitmanager_postgres_data:/data -v $(pwd):/backup \
   alpine tar czf /backup/postgres_backup.tar.gz -C /data .
 
 # Backup du volume media
-docker run --rm -v repair_tracker_media_volume:/data -v $(pwd):/backup \
+docker run --rm -v kitmanager_media_volume:/data -v $(pwd):/backup \
   alpine tar czf /backup/media_backup.tar.gz -C /data .
 ```
 
@@ -302,4 +302,4 @@ Ce projet est sous licence [à définir].
 
 ---
 
-**Repair Tracker** - Système de suivi des réparations d'équipements ASC
+**KitManager** - Système de suivi des réparations d'équipements ASC

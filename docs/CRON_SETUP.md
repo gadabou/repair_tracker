@@ -39,7 +39,7 @@ crontab -e
 
 2. Ajouter la ligne suivante pour exécuter la vérification tous les jours à 7h00 GMT :
 ```cron
-0 9 * * * cd /chemin/vers/repair_tracker && /chemin/vers/python manage.py check_delay_alerts >> /var/log/repair_tracker_alerts.log 2>&1
+0 9 * * * cd /chemin/vers/kitmanager && /chemin/vers/python manage.py check_delay_alerts >> /var/log/kitmanager_alerts.log 2>&1
 ```
 
 3. Exemples d'horaires :
@@ -60,26 +60,26 @@ crontab -e
 
 ### Option 2 : Systemd Timer (Linux moderne)
 
-1. Créer le service `/etc/systemd/system/repair-tracker-alerts.service` :
+1. Créer le service `/etc/systemd/system/kitmanager-alerts.service` :
 ```ini
 [Unit]
-Description=Repair Tracker - Vérification des alertes de dépassement
+Description=KitManager - Vérification des alertes de dépassement
 After=network.target
 
 [Service]
 Type=oneshot
 User=www-data
-WorkingDirectory=/chemin/vers/repair_tracker
+WorkingDirectory=/chemin/vers/kitmanager
 ExecStart=/chemin/vers/python manage.py check_delay_alerts
 StandardOutput=journal
 StandardError=journal
 ```
 
-2. Créer le timer `/etc/systemd/system/repair-tracker-alerts.timer` :
+2. Créer le timer `/etc/systemd/system/kitmanager-alerts.timer` :
 ```ini
 [Unit]
-Description=Repair Tracker - Timer pour les alertes quotidiennes
-Requires=repair-tracker-alerts.service
+Description=KitManager - Timer pour les alertes quotidiennes
+Requires=kitmanager-alerts.service
 
 [Timer]
 OnCalendar=daily
@@ -94,11 +94,11 @@ WantedBy=timers.target
 3. Activer et démarrer le timer :
 ```bash
 sudo systemctl daemon-reload
-sudo systemctl enable repair-tracker-alerts.timer
-sudo systemctl start repair-tracker-alerts.timer
+sudo systemctl enable kitmanager-alerts.timer
+sudo systemctl start kitmanager-alerts.timer
 
 # Vérifier le statut
-sudo systemctl status repair-tracker-alerts.timer
+sudo systemctl status kitmanager-alerts.timer
 sudo systemctl list-timers
 ```
 
@@ -178,7 +178,7 @@ EMAIL_PORT=587
 EMAIL_USE_TLS=True
 EMAIL_HOST_USER=votre-email@gmail.com
 EMAIL_HOST_PASSWORD=votre-mot-de-passe-app
-DEFAULT_FROM_EMAIL=noreply@repair-tracker.com
+DEFAULT_FROM_EMAIL=noreply@kitmanager.com
 ```
 
 ### Configuration Gmail
@@ -187,7 +187,7 @@ DEFAULT_FROM_EMAIL=noreply@repair-tracker.com
 2. Créer un mot de passe d'application :
    - Aller sur https://myaccount.google.com/security
    - Sélectionner "Mots de passe des applications"
-   - Créer un nouveau mot de passe pour "Repair Tracker"
+   - Créer un nouveau mot de passe pour "KitManager"
 3. Utiliser ce mot de passe dans `EMAIL_HOST_PASSWORD`
 
 ### Test de configuration email
@@ -212,10 +212,10 @@ python manage.py shell
 
 ```bash
 # Logs système (si configuré avec cron)
-tail -f /var/log/repair_tracker_alerts.log
+tail -f /var/log/kitmanager_alerts.log
 
 # Logs systemd
-journalctl -u repair-tracker-alerts.service -f
+journalctl -u kitmanager-alerts.service -f
 
 # Logs Django (si configuré)
 tail -f /path/to/django/logs/alerts.log

@@ -26,7 +26,7 @@
 crontab -e
 
 # Ajouter cette ligne (exécution tous les jours à 7h00 GMT)
-0 7 * * * cd /chemin/vers/repair_tracker && python manage.py check_delay_alerts >> /var/log/alerts.log 2>&1
+0 7 * * * cd /chemin/vers/kitmanager && python manage.py check_delay_alerts >> /var/log/alerts.log 2>&1
 
 # IMPORTANT: Vérifier que le serveur est en GMT
 # timedatectl
@@ -55,7 +55,7 @@ EMAIL_PORT=587
 EMAIL_USE_TLS=True
 EMAIL_HOST_USER=votre-email@gmail.com
 EMAIL_HOST_PASSWORD=votre-mot-de-passe-app
-DEFAULT_FROM_EMAIL=repair-tracker@example.com
+DEFAULT_FROM_EMAIL=kitmanager@example.com
 ```
 
 **Note** : Pour Gmail, créez un "Mot de passe d'application" dans les paramètres de sécurité Google.

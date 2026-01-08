@@ -12,6 +12,7 @@ urlpatterns = [
     path('tickets/', include('tickets.urls')),
     path('accounts/', include('accounts.urls')),
     path('assets/', include('assets.urls')),
+    path('employees/', include('employees.urls')),
     path('api/', include('config.api_urls')),
 
     # Authentication URLs

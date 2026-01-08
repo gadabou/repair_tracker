@@ -92,7 +92,7 @@ Accès: Administrateurs uniquement
 crontab -e
 
 # Ajouter la ligne suivante (adapter les chemins)
-0 7 * * * cd /chemin/vers/repair_tracker && python manage.py check_delay_alerts >> /var/log/alerts.log 2>&1
+0 7 * * * cd /chemin/vers/kitmanager && python manage.py check_delay_alerts >> /var/log/alerts.log 2>&1
 
 # Vérifier le fuseau horaire (doit être GMT)
 timedatectl
@@ -186,7 +186,7 @@ if days_in_stage >= 14:  # Changez 14 par le seuil souhaité
 ### Les emails ne partent pas
 1. ✅ Vérifier la configuration dans `.env`
 2. ✅ Tester manuellement : `python manage.py check_delay_alerts --dry-run`
-3. ✅ Vérifier les logs : `tail -f /var/log/repair_tracker_alerts.log`
+3. ✅ Vérifier les logs : `tail -f /var/log/kitmanager_alerts.log`
 4. ✅ Tester la connexion email :
    ```python
    python manage.py shell
@@ -287,7 +287,7 @@ Pour toute question ou assistance :
 
 ---
 
-**Système développé pour Repair Tracker**
+**Système développé pour KitManager**
 *Amélioration continue du suivi des réparations d'équipements ASC*
 
 ---

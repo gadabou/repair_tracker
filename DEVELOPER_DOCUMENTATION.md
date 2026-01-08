@@ -1,4 +1,4 @@
-# Documentation Développeur - Repair Tracker
+# Documentation Développeur - KitManager
 
 ## Table des matières
 
@@ -20,7 +20,7 @@
 
 ### Description
 
-**Repair Tracker** est un système de gestion et de suivi des réparations d'équipements (téléphones et tablettes) pour les Agents de Santé Communautaire (ASC) au Togo. Le système permet de suivre le cycle complet de réparation, depuis la déclaration d'un problème par un superviseur jusqu'à la réparation et le retour de l'équipement à l'ASC.
+**KitManager** est un système de gestion et de suivi des réparations d'équipements (téléphones et tablettes) pour les Agents de Santé Communautaire (ASC) au Togo. Le système permet de suivre le cycle complet de réparation, depuis la déclaration d'un problème par un superviseur jusqu'à la réparation et le retour de l'équipement à l'ASC.
 
 ### Technologies utilisées
 
@@ -48,7 +48,7 @@
 ### Structure des dossiers
 
 ```
-repair_tracker/
+kitmanager/
 ├── config/                 # Configuration principale du projet
 │   ├── settings.py        # Paramètres Django
 │   ├── urls.py            # Routes URL principales
@@ -1091,7 +1091,7 @@ templates/
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>{% block title %}Repair Tracker{% endblock %}</title>
+    <title>{% block title %}KitManager{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 </head>
@@ -1219,7 +1219,7 @@ SECRET_KEY=votre-clé-secrète-très-longue-et-aléatoire
 ALLOWED_HOSTS=localhost,127.0.0.1
 
 # Base de données (Production)
-DATABASE_URL=postgresql://user:password@localhost:5432/repair_tracker
+DATABASE_URL=postgresql://user:password@localhost:5432/kitmanager
 
 # Email (optionnel)
 EMAIL_HOST=smtp.gmail.com
@@ -1242,7 +1242,7 @@ DEFAULT_FROM_EMAIL=votre-email@gmail.com
 ```bash
 # 1. Cloner le repository
 git clone <url-du-repo>
-cd repair_tracker
+cd kitmanager
 
 # 2. Créer un environnement virtuel
 python3 -m venv venv
@@ -1320,7 +1320,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
-      POSTGRES_DB: repair_tracker
+      POSTGRES_DB: kitmanager
       POSTGRES_USER: repair_user
       POSTGRES_PASSWORD: secure_password
     restart: unless-stopped
@@ -1333,7 +1333,7 @@ services:
     environment:
       DEBUG: 'False'
       SECRET_KEY: ${SECRET_KEY}
-      DATABASE_URL: postgresql://repair_user:secure_password@db:5432/repair_tracker
+      DATABASE_URL: postgresql://repair_user:secure_password@db:5432/kitmanager
       ALLOWED_HOSTS: yourdomain.com,www.yourdomain.com
     depends_on:
       - db
@@ -1411,7 +1411,7 @@ docker-compose down -v
 #!/bin/bash
 set -e
 
-echo "🚀 Déploiement de Repair Tracker"
+echo "🚀 Déploiement de KitManager"
 
 # Pull des dernières modifications
 echo "📥 Récupération du code..."
@@ -1597,7 +1597,7 @@ python manage.py send_reminders
 **Configuration cron** (recommandé):
 ```bash
 # Exécuter tous les jours à 9h00
-0 9 * * * cd /path/to/repair_tracker && /path/to/venv/bin/python manage.py send_reminders
+0 9 * * * cd /path/to/kitmanager && /path/to/venv/bin/python manage.py send_reminders
 ```
 
 **Code clé**:
@@ -1644,7 +1644,7 @@ class Command(BaseCommand):
 
 ```bash
 git clone <url-du-repo>
-cd repair_tracker
+cd kitmanager
 ```
 
 #### 2. Créer un environnement virtuel
@@ -2104,7 +2104,7 @@ def ma_vue(request):
 DEBUG=False
 SECRET_KEY=<généré-avec-get_random_secret_key>
 ALLOWED_HOSTS=yourdomain.com,www.yourdomain.com
-DATABASE_URL=postgresql://user:password@localhost:5432/repair_tracker
+DATABASE_URL=postgresql://user:password@localhost:5432/kitmanager
 CSRF_COOKIE_SECURE=True
 SESSION_COOKIE_SECURE=True
 SECURE_SSL_REDIRECT=True

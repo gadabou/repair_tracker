@@ -1,4 +1,4 @@
-# Guide de Démarrage Rapide - Repair Tracker
+# Guide de Démarrage Rapide - KitManager
 
 ## Installation en 5 Étapes
 
@@ -185,4 +185,4 @@ Pour toute question ou problème :
 
 ---
 
-**Bon test de l'application Repair Tracker!**
+**Bon test de l'application KitManager!**

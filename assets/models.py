@@ -44,6 +44,16 @@ class Equipment(models.Model):
         verbose_name="Propriétaire ASC"
     )
 
+    # Employé assigné
+    employee = models.ForeignKey(
+        'employees.Employee',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='equipments',
+        verbose_name="Employé assigné"
+    )
+
     # Statut
     status = models.CharField(
         max_length=20,
@@ -88,7 +98,11 @@ class Equipment(models.Model):
         ordering = ['-created_at']
 
     def __str__(self):
-        owner_info = f" - {self.owner.get_full_name()}" if self.owner else ""
+        owner_info = ""
+        if self.employee:
+            owner_info = f" - {self.employee.get_full_name()}"
+        elif self.owner:
+            owner_info = f" - {self.owner.get_full_name()}"
         return f"{self.brand} {self.model} ({self.imei}){owner_info}"
 
     def get_status_color(self):
@@ -106,7 +120,8 @@ class EquipmentHistory(models.Model):
     """Historique des changements d'équipement"""
     ACTION_CHOICES = [
         ('CREATED', 'Créé'),
-        ('ASSIGNED', 'Assigné'),
+        ('ASSIGNED', 'Assigné à ASC'),
+        ('ASSIGNED_TO_EMPLOYEE', 'Assigné à Employé'),
         ('STATUS_CHANGED', 'Statut modifié'),
         ('TRANSFERRED', 'Transféré'),
         ('RETIRED', 'Réformé'),

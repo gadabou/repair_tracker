@@ -130,7 +130,7 @@ Voir le fichier `docs/CRON_SETUP.md` pour les instructions détaillées.
 **Recommandation** : Exécuter tous les matins à 9h00 :
 
 ```cron
-0 9 * * * cd /path/to/repair_tracker && python manage.py check_delay_alerts
+0 9 * * * cd /path/to/kitmanager && python manage.py check_delay_alerts
 ```
 
 ## Configuration Email
@@ -147,7 +147,7 @@ EMAIL_PORT=587
 EMAIL_USE_TLS=True
 EMAIL_HOST_USER=votre-email@gmail.com
 EMAIL_HOST_PASSWORD=mot-de-passe-application-gmail
-DEFAULT_FROM_EMAIL=repair-tracker@votre-domaine.com
+DEFAULT_FROM_EMAIL=kitmanager@votre-domaine.com
 
 # Pour le développement (console)
 EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend
@@ -203,7 +203,7 @@ Dans l'interface `/tickets/alerts/config/`, section "Historique des alertes réc
 
 ```bash
 # Logs de la commande cron
-tail -f /var/log/repair_tracker_alerts.log
+tail -f /var/log/kitmanager_alerts.log
 
 # Logs Django
 tail -f /path/to/logs/django.log
