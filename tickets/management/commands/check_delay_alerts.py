@@ -1,6 +1,7 @@
+# -*- coding: utf-8 -*-
 """
-Commande Django pour vérifier les tickets qui dépassent 14 jours dans une étape
-et envoyer des alertes par email aux destinataires configurés.
+Commande Django pour verifier les tickets qui depassent 14 jours dans une etape
+et envoyer des alertes par email aux destinataires configures.
 """
 from django.core.management.base import BaseCommand
 from django.utils import timezone

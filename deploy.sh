@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # ============================================================================
-# Script de déploiement automatique - Repair Tracker
+# Script de déploiement automatique - KitManager
 # ============================================================================
-# Ce script déploie automatiquement l'application Repair Tracker avec Docker
+# Ce script déploie automatiquement l'application KitManager avec Docker
 # ============================================================================
 
 set -e  # Arrêter en cas d'erreur
@@ -147,7 +147,7 @@ show_connection_info() {
     echo ""
     print_info "🗄️  Base de données PostgreSQL:"
     echo "   Host: localhost:5432"
-    echo "   Database: repair_tracker"
+    echo "   Database: kitmanager"
     echo "   User: admin"
     echo "   Password: repair_password_2024"
     echo ""
@@ -164,7 +164,7 @@ show_connection_info() {
 show_menu() {
     echo ""
     print_info "╔════════════════════════════════════════════════════════════╗"
-    print_info "║     Script de Déploiement - Repair Tracker Docker        ║"
+    print_info "║     Script de Déploiement - KitManager Docker        ║"
     print_info "╚════════════════════════════════════════════════════════════╝"
     echo ""
     echo "Choisissez une option:"

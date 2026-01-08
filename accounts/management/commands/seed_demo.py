@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 from datetime import timedelta
@@ -76,7 +77,7 @@ class Command(BaseCommand):
         admin, created = User.objects.get_or_create(
             username='admin',
             defaults={
-                'email': 'admin@repair-tracker.local',
+                'email': 'admin@kitmanager.local',
                 'role': 'ADMIN',
                 'is_staff': True,
                 'is_superuser': True,

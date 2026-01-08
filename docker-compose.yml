@@ -3,17 +3,17 @@
 services:
   db:
     image: postgres:16-alpine
-    container_name: repair_tracker_db
+    container_name: kitmanager_db
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
-      - POSTGRES_DB=repair_tracker
+      - POSTGRES_DB=kitmanager
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=P@$$W0rd2025
     ports:
       - "5333:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U admin -d repair_tracker"]
+      test: ["CMD-SHELL", "pg_isready -U admin -d kitmanager"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -21,7 +21,7 @@ services:
 
   web:
     build: .
-    container_name: repair_tracker_web
+    container_name: kitmanager_web
     command: gunicorn --bind 0.0.0.0:8000 --workers 3 --timeout 120 config.wsgi:application
     volumes:
       - .:/app
@@ -32,7 +32,7 @@ services:
     environment:
       - DEBUG=False
       - SECRET_KEY=npck&e0hxnb6*nml^plrf30_ri(5a!vp-v-7&ktckpos-t0zwl
-      - DATABASE_URL=postgresql://admin:P@$$W0rd2025@db:5432/repair_tracker
+      - DATABASE_URL=postgresql://admin:P@$$W0rd2025@db:5432/kitmanager
       - ALLOWED_HOSTS=localhost,127.0.0.1,0.0.0.0
       - DJANGO_SETTINGS_MODULE=config.settings
     depends_on:
@@ -42,7 +42,7 @@ services:
 
   nginx:
     image: nginx:alpine
-    container_name: repair_tracker_nginx
+    container_name: kitmanager_nginx
     ports:
       - "88:80"
     volumes:
