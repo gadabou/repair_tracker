@@ -98,12 +98,9 @@ def equipment_create(request):
         return redirect('assets:detail', pk=equipment.pk)
 
     # GET - Afficher le formulaire
-    ascs = ASC.objects.filter(is_active=True).select_related('site')
-
     context = {
         'equipment_types': Equipment.TYPE_CHOICES,
         'status_choices': Equipment.STATUS_CHOICES,
-        'ascs': ascs,
     }
     return render(request, 'assets/create.html', context)
 

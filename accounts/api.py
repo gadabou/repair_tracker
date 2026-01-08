@@ -1,4 +1,5 @@
 from rest_framework import viewsets, serializers
+from rest_framework.pagination import PageNumberPagination
 from .models import ASC, User, Supervisor
 
 
@@ -16,9 +17,16 @@ class ASCSerializer(serializers.ModelSerializer):
         ]
 
 
+class StandardResultsSetPagination(PageNumberPagination):
+    page_size = 20
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
+
 class ASCViewSet(viewsets.ModelViewSet):
     queryset = ASC.objects.all().select_related('site', 'supervisor', 'zone_asc')
     serializer_class = ASCSerializer
+    pagination_class = StandardResultsSetPagination
 
     def get_queryset(self):
         queryset = super().get_queryset()

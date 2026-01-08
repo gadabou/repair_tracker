@@ -2,6 +2,11 @@
 
 {% block title %}Créer un Équipement - Repair Tracker{% endblock %}
 
+{% block extra_css %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+{% endblock %}
+
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1><i class="bi bi-phone-fill"></i> Créer un Équipement</h1>
@@ -93,13 +98,8 @@
                             <label for="owner" class="form-label">
                                 Propriétaire ASC
                             </label>
-                            <select class="form-select" id="owner" name="owner">
+                            <select class="form-control" id="owner" name="owner">
                                 <option value="">-- Non attribué (optionnel) --</option>
-                                {% for asc in ascs %}
-                                <option value="{{ asc.id }}">
-                                    {{ asc.get_full_name }} ({{ asc.code }}) - {{ asc.site }}
-                                </option>
-                                {% endfor %}
                             </select>
                             <small class="form-text text-muted">
                                 Vous pouvez attribuer l'équipement plus tard
@@ -174,8 +174,41 @@
 {% endblock %}
 
 {% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
 $(document).ready(function() {
+    // Initialiser Select2 pour le champ Propriétaire ASC avec recherche AJAX
+    $('#owner').select2({
+        theme: 'bootstrap-5',
+        placeholder: '-- Non attribué (optionnel) --',
+        allowClear: true,
+        width: '100%',
+        ajax: {
+            url: '/api/ascs/',
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+                return {
+                    search: params.term,
+                    page: params.page || 1
+                };
+            },
+            processResults: function (data) {
+                console.log('ASCs reçus:', data);
+                return {
+                    results: data.results.map(function(asc) {
+                        return {
+                            id: asc.id,
+                            text: asc.first_name + ' ' + asc.last_name + ' (' + asc.code + ')' + (asc.site_name ? ' - ' + asc.site_name : '')
+                        };
+                    })
+                };
+            },
+            cache: true
+        }
+    });
+    console.log('Select2 initialisé pour le champ Propriétaire ASC');
+
     // Show/hide assignment date based on owner selection
     $('#owner').on('change', function() {
         var ownerId = $(this).val();

@@ -139,6 +139,7 @@ $(document).ready(function() {
         theme: 'bootstrap-5',
         placeholder: '-- Sélectionner un ASC --',
         allowClear: true,
+        width: '100%',
         ajax: {
             url: '/api/ascs/',
             dataType: 'json',
@@ -167,7 +168,8 @@ $(document).ready(function() {
     $('#equipment_select').select2({
         theme: 'bootstrap-5',
         placeholder: '-- Sélectionner un équipement --',
-        allowClear: true
+        allowClear: true,
+        width: '100%'
     });
 
     // Charger les équipements quand un ASC est sélectionné
@@ -178,50 +180,83 @@ $(document).ready(function() {
         if (ascId) {
             // Activer le champ équipement et charger les données
             equipmentSelect.prop('disabled', false);
+
+            // Détruire Select2 s'il existe
+            if (equipmentSelect.hasClass("select2-hidden-accessible")) {
+                equipmentSelect.select2('destroy');
+            }
+
             equipmentSelect.empty().append('<option value="">-- Chargement... --</option>');
 
             // Récupérer les équipements de l'ASC sélectionné
+            console.log('Chargement des équipements pour ASC ID:', ascId);
             $.ajax({
                 url: '/api/equipment/',
                 data: { asc_id: ascId },
                 dataType: 'json',
                 success: function(data) {
-                    equipmentSelect.empty().append('<option value="">-- Sélectionner un équipement --</option>');
+                    console.log('Équipements reçus:', data);
+
+                    // Vider et reconstruire les options
+                    equipmentSelect.empty();
+                    equipmentSelect.append('<option value="">-- Sélectionner un équipement --</option>');
 
                     // Gérer la réponse paginée de DRF ou un tableau direct
                     const equipments = data.results || data;
+                    console.log('Nombre d\'équipements:', equipments.length);
 
                     if (equipments.length === 0) {
                         equipmentSelect.append('<option value="" disabled>Aucun équipement disponible pour cet ASC</option>');
+                        console.warn('Aucun équipement trouvé pour cet ASC');
                     } else {
                         equipments.forEach(function(equipment) {
-                            equipmentSelect.append(
-                                $('<option></option>')
-                                    .val(equipment.id)
-                                    .text(equipment.brand + ' ' + equipment.model + ' (' + equipment.imei + ')')
-                            );
+                            const optionText = equipment.brand + ' ' + equipment.model + ' (' + equipment.imei + ')';
+                            equipmentSelect.append(new Option(optionText, equipment.id, false, false));
                         });
+                        console.log('Équipements ajoutés au select');
                     }
 
-                    // Réinitialiser Select2
+                    // Réinitialiser Select2 après l'ajout des options
                     equipmentSelect.select2({
                         theme: 'bootstrap-5',
                         placeholder: '-- Sélectionner un équipement --',
-                        allowClear: true
+                        allowClear: true,
+                        width: '100%'
                     });
+
+                    console.log('Select2 réinitialisé');
                 },
                 error: function(xhr, status, error) {
                     console.error('Erreur de chargement des équipements:', error);
+                    console.error('Status:', status);
+                    console.error('Response:', xhr.responseText);
                     equipmentSelect.empty().append('<option value="">-- Erreur de chargement --</option>');
+
+                    // Réinitialiser Select2 même en cas d'erreur
+                    equipmentSelect.select2({
+                        theme: 'bootstrap-5',
+                        placeholder: '-- Erreur de chargement --',
+                        width: '100%'
+                    });
+
+                    alert('Erreur lors du chargement des équipements. Veuillez réessayer.');
                 }
             });
         } else {
             // Désactiver le champ équipement si aucun ASC n'est sélectionné
             equipmentSelect.prop('disabled', true);
+
+            // Détruire Select2 s'il existe
+            if (equipmentSelect.hasClass("select2-hidden-accessible")) {
+                equipmentSelect.select2('destroy');
+            }
+
             equipmentSelect.empty().append('<option value="">-- Sélectionner d\'abord un ASC --</option>');
+
             equipmentSelect.select2({
                 theme: 'bootstrap-5',
-                placeholder: '-- Sélectionner d\'abord un ASC --'
+                placeholder: '-- Sélectionner d\'abord un ASC --',
+                width: '100%'
             });
         }
     });

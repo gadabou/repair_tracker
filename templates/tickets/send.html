@@ -112,7 +112,8 @@ $(document).ready(function() {
     $('#recipient').select2({
         theme: 'bootstrap-5',
         placeholder: '-- Sélectionner un destinataire --',
-        allowClear: true
+        allowClear: true,
+        width: '100%'
     });
 
     // Quand l'étape de destination change
@@ -130,7 +131,13 @@ $(document).ready(function() {
             const role = roleToStageMapping[stage];
 
             if (role) {
+                // Détruire Select2 s'il existe
+                if (recipientSelect.hasClass("select2-hidden-accessible")) {
+                    recipientSelect.select2('destroy');
+                }
+
                 // Charger les utilisateurs de ce rôle
+                console.log('Chargement des utilisateurs pour le rôle:', role);
                 recipientSelect.empty().append('<option value="">-- Chargement... --</option>');
 
                 $.ajax({
@@ -138,32 +145,50 @@ $(document).ready(function() {
                     data: { role: role },
                     dataType: 'json',
                     success: function(data) {
-                        recipientSelect.empty().append('<option value="">-- Sélectionner un destinataire --</option>');
+                        console.log('Utilisateurs reçus:', data);
+
+                        // Vider et reconstruire les options
+                        recipientSelect.empty();
+                        recipientSelect.append('<option value="">-- Sélectionner un destinataire --</option>');
 
                         if (data.length === 0) {
                             recipientSelect.append('<option value="" disabled>Aucun utilisateur disponible pour ce département</option>');
+                            console.warn('Aucun utilisateur trouvé pour ce rôle');
                         } else {
                             data.forEach(function(user) {
                                 const fullName = (user.first_name && user.last_name)
                                     ? user.first_name + ' ' + user.last_name
                                     : user.username;
-                                recipientSelect.append(
-                                    $('<option></option>')
-                                        .val(user.id)
-                                        .text(fullName + ' (' + user.role_display + ')')
-                                );
+                                const optionText = fullName + ' (' + user.role_display + ')';
+                                recipientSelect.append(new Option(optionText, user.id, false, false));
                             });
+                            console.log('Utilisateurs ajoutés au select');
                         }
 
-                        // Réinitialiser Select2
+                        // Réinitialiser Select2 après l'ajout des options
                         recipientSelect.select2({
                             theme: 'bootstrap-5',
                             placeholder: '-- Sélectionner un destinataire --',
-                            allowClear: true
+                            allowClear: true,
+                            width: '100%'
                         });
+
+                        console.log('Select2 réinitialisé');
                     },
-                    error: function() {
+                    error: function(xhr, status, error) {
+                        console.error('Erreur de chargement des utilisateurs:', error);
+                        console.error('Status:', status);
+                        console.error('Response:', xhr.responseText);
                         recipientSelect.empty().append('<option value="">-- Erreur de chargement --</option>');
+
+                        // Réinitialiser Select2 même en cas d'erreur
+                        recipientSelect.select2({
+                            theme: 'bootstrap-5',
+                            placeholder: '-- Erreur de chargement --',
+                            width: '100%'
+                        });
+
+                        alert('Erreur lors du chargement des utilisateurs. Veuillez réessayer.');
                     }
                 });
             }
@@ -171,6 +196,12 @@ $(document).ready(function() {
             // Cacher le champ destinataire pour RETURNED_ASC
             recipientField.hide();
             recipientSelect.prop('required', false);
+
+            // Détruire Select2 s'il existe
+            if (recipientSelect.hasClass("select2-hidden-accessible")) {
+                recipientSelect.select2('destroy');
+            }
+
             recipientSelect.val('').trigger('change');
         }
     });

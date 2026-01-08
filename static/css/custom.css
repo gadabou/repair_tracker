@@ -485,6 +485,93 @@ footer p {
 }
 
 /* ==========================================
+   SELECT2 STYLES
+   ========================================== */
+
+/* Select2 container */
+.select2-container {
+    width: 100% !important;
+}
+
+.select2-container .select2-selection--single {
+    height: calc(3.5rem + 2px);
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+}
+
+.select2-container--bootstrap-5 .select2-selection {
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+}
+
+.select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+    line-height: 2rem;
+    padding-left: 0;
+}
+
+.select2-container--bootstrap-5 .select2-selection--single .select2-selection__arrow {
+    height: calc(3.5rem);
+    right: 1rem;
+}
+
+/* Select2 dropdown */
+.select2-dropdown {
+    border: none;
+    border-radius: 12px;
+    box-shadow: var(--shadow-lg);
+    z-index: 9999 !important;
+}
+
+.select2-container--bootstrap-5 .select2-dropdown {
+    border: none;
+    box-shadow: var(--shadow-lg);
+}
+
+.select2-results__option {
+    padding: 0.75rem 1rem;
+    transition: all 0.2s ease;
+}
+
+.select2-results__option--highlighted {
+    background-color: var(--tertiary-color) !important;
+    color: white !important;
+}
+
+.select2-results__option--selected {
+    background-color: rgba(11, 88, 141, 0.1) !important;
+    color: var(--primary-color) !important;
+}
+
+/* Select2 search field */
+.select2-search--dropdown .select2-search__field {
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    margin: 0.5rem;
+    width: calc(100% - 1rem);
+}
+
+.select2-search--dropdown .select2-search__field:focus {
+    border-color: var(--tertiary-color);
+    outline: none;
+}
+
+/* Fix for z-index issues */
+.select2-container--open {
+    z-index: 9999 !important;
+}
+
+.select2-container--open .select2-dropdown {
+    z-index: 9999 !important;
+}
+
+/* Loading state */
+.select2-results__option--loading {
+    color: var(--primary-color);
+}
+
+/* ==========================================
    RESPONSIVE DESIGN
    ========================================== */
 

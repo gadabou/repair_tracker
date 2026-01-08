@@ -306,97 +306,97 @@
     <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #f8f9fa; padding: 20px 0;">
         <tr>
             <td align="center">
-                <table role="presentation" cellspacing="0" cellpadding="0" border="0" class="email-container">
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" class="email-container" style="max-width: 600px; margin: 0 auto; background-color: #ffffff;">
                     <!-- Header -->
                     <tr>
-                        <td class="email-header">
-                            <img src="cid:logo" alt="Integrate Health" style="max-width: 200px; height: auto;">
-                            <h1>Equipment Manager</h1>
-                            <p>Notification de Ticket</p>
+                        <td class="email-header" style="background: linear-gradient(135deg, #0B588d 0%, #27a5de 100%); background-color: #0B588d; padding: 30px 20px; text-align: center;">
+                            <img src="https://integratehealth.org/wp-content/uploads/2023/02/IH-Logo-color-1024x351.png" alt="Integrate Health" style="max-width: 200px; height: auto; display: block; margin: 0 auto 15px;">
+                            <h1 style="color: #ffffff; font-size: 24px; font-weight: 700; margin: 10px 0 5px 0;">Equipment Manager</h1>
+                            <p style="color: rgba(255, 255, 255, 0.9); font-size: 14px; margin: 0;">Notification de Ticket</p>
                         </td>
                     </tr>
 
                     <!-- Content -->
                     <tr>
-                        <td class="email-content">
-                            <p class="greeting">Bonjour{% if recipient %} {{ recipient.get_full_name }}{% endif %},</p>
+                        <td class="email-content" style="padding: 30px 25px; background-color: #ffffff;">
+                            <p class="greeting" style="font-size: 18px; font-weight: 600; color: #0B588d; margin-bottom: 15px;">Bonjour{% if recipient %} {{ recipient.get_full_name }}{% endif %},</p>
 
-                            <p class="intro-text">
+                            <p class="intro-text" style="font-size: 15px; color: #333333; line-height: 1.6; margin-bottom: 25px;">
                                 Vous avez reçu un nouveau ticket à traiter dans le système <strong>Equipment Manager</strong> d'Integrate Health.
                             </p>
 
                             <!-- Ticket Information -->
-                            <div class="info-box">
-                                <h3>Informations du Ticket</h3>
-                                <div class="info-row">
-                                    <strong>Numéro :</strong>
-                                    <span>{{ ticket.ticket_number }}</span>
+                            <div class="info-box" style="background: linear-gradient(135deg, rgba(11, 88, 141, 0.05) 0%, rgba(39, 165, 222, 0.05) 100%); background-color: rgba(11, 88, 141, 0.05); border-left: 4px solid #0B588d; border-radius: 8px; padding: 20px; margin: 20px 0;">
+                                <h3 style="color: #0B588d; font-size: 16px; font-weight: 700; margin: 0 0 15px 0;">📋 Informations du Ticket</h3>
+                                <div class="info-row" style="margin: 10px 0; font-size: 14px; line-height: 1.6;">
+                                    <strong style="color: #0B588d; font-weight: 600;">Numéro :</strong>
+                                    <span style="color: #333333;">{{ ticket.ticket_number }}</span>
                                 </div>
-                                <div class="info-row">
-                                    <strong>Équipement :</strong>
-                                    <span>{{ ticket.equipment.brand }} {{ ticket.equipment.model }} ({{ ticket.equipment.imei }})</span>
+                                <div class="info-row" style="margin: 10px 0; font-size: 14px; line-height: 1.6;">
+                                    <strong style="color: #0B588d; font-weight: 600;">Équipement :</strong>
+                                    <span style="color: #333333;">{{ ticket.equipment.brand }} {{ ticket.equipment.model }} ({{ ticket.equipment.imei }})</span>
                                 </div>
-                                <div class="info-row">
-                                    <strong>ASC :</strong>
-                                    <span>{{ ticket.asc.get_full_name }} ({{ ticket.asc.code }})</span>
+                                <div class="info-row" style="margin: 10px 0; font-size: 14px; line-height: 1.6;">
+                                    <strong style="color: #0B588d; font-weight: 600;">ASC :</strong>
+                                    <span style="color: #333333;">{{ ticket.asc.get_full_name }} ({{ ticket.asc.code }})</span>
                                 </div>
                                 {% if ticket.asc.site %}
-                                <div class="info-row">
-                                    <strong>Site :</strong>
-                                    <span>{{ ticket.asc.site.name }}</span>
+                                <div class="info-row" style="margin: 10px 0; font-size: 14px; line-height: 1.6;">
+                                    <strong style="color: #0B588d; font-weight: 600;">Site :</strong>
+                                    <span style="color: #333333;">{{ ticket.asc.site.name }}</span>
                                 </div>
                                 {% endif %}
-                                <div class="info-row">
-                                    <strong>Département destinataire :</strong>
-                                    <span>{{ to_role_display }}</span>
+                                <div class="info-row" style="margin: 10px 0; font-size: 14px; line-height: 1.6;">
+                                    <strong style="color: #0B588d; font-weight: 600;">Département destinataire :</strong>
+                                    <span style="color: #333333;">{{ to_role_display }}</span>
                                 </div>
-                                <div class="info-row">
-                                    <strong>Envoyé par :</strong>
-                                    <span>{{ sender.get_full_name }} ({{ sender.get_role_display }})</span>
+                                <div class="info-row" style="margin: 10px 0; font-size: 14px; line-height: 1.6;">
+                                    <strong style="color: #0B588d; font-weight: 600;">Envoyé par :</strong>
+                                    <span style="color: #333333;">{{ sender.get_full_name }} ({{ sender.get_role_display }})</span>
                                 </div>
-                                <div class="info-row">
-                                    <strong>Date d'envoi :</strong>
-                                    <span>{{ ticket.updated_at|date:"d/m/Y à H:i" }}</span>
+                                <div class="info-row" style="margin: 10px 0; font-size: 14px; line-height: 1.6;">
+                                    <strong style="color: #0B588d; font-weight: 600;">Date d'envoi :</strong>
+                                    <span style="color: #333333;">{{ ticket.updated_at|date:"d/m/Y à H:i" }}</span>
                                 </div>
                             </div>
 
                             <!-- Problem Description -->
                             {% if ticket.initial_problem_description %}
-                            <div class="problem-box">
-                                <h3>Description du problème</h3>
-                                <p>{{ ticket.initial_problem_description }}</p>
+                            <div class="problem-box" style="background: linear-gradient(135deg, rgba(39, 165, 222, 0.05) 0%, rgba(209, 215, 63, 0.05) 100%); background-color: rgba(39, 165, 222, 0.05); border-left: 4px solid #27a5de; border-radius: 8px; padding: 20px; margin: 20px 0;">
+                                <h3 style="color: #27a5de; font-size: 16px; font-weight: 700; margin: 0 0 10px 0;">🔍 Description du problème</h3>
+                                <p style="color: #333333; font-size: 14px; line-height: 1.6; margin: 0;">{{ ticket.initial_problem_description }}</p>
                             </div>
                             {% endif %}
 
                             <!-- Comment -->
                             {% if comment %}
-                            <div class="comment-box">
-                                <h4>Commentaire</h4>
-                                <p>{{ comment }}</p>
+                            <div class="comment-box" style="background: linear-gradient(135deg, rgba(209, 215, 63, 0.1) 0%, rgba(184, 191, 18, 0.1) 100%); background-color: rgba(209, 215, 63, 0.1); border-left: 4px solid #d1d73f; border-radius: 8px; padding: 20px; margin: 20px 0;">
+                                <h4 style="color: #b8bf12; font-size: 15px; font-weight: 700; margin: 0 0 10px 0;">💬 Commentaire</h4>
+                                <p style="color: #333333; font-size: 14px; line-height: 1.6; margin: 0;">{{ comment }}</p>
                             </div>
                             {% endif %}
 
                             <!-- Button -->
-                            <div class="button-container">
-                                <a href="{{ ticket_url }}" class="button">
+                            <div class="button-container" style="text-align: center; margin: 30px 0;">
+                                <a href="{{ ticket_url }}" class="button" style="display: inline-block; background: linear-gradient(135deg, #0B588d 0%, #27a5de 100%); background-color: #0B588d; color: #ffffff !important; text-decoration: none; padding: 15px 40px; border-radius: 10px; font-size: 16px; font-weight: 700; box-shadow: 0 4px 12px rgba(11, 88, 141, 0.25);">
                                     📥 Confirmer la Réception
                                 </a>
                             </div>
 
                             <!-- Action Required -->
-                            <div class="action-box">
-                                <p>Action requise : Veuillez confirmer la réception et traiter ce ticket rapidement</p>
+                            <div class="action-box" style="background: linear-gradient(135deg, rgba(233, 38, 86, 0.05) 0%, rgba(196, 30, 71, 0.05) 100%); background-color: rgba(233, 38, 86, 0.05); border: 2px solid #e92656; border-radius: 8px; padding: 15px 20px; margin: 25px 0; text-align: center;">
+                                <p style="color: #e92656; font-size: 14px; font-weight: 600; margin: 0;">⚠️ Action requise : Veuillez confirmer la réception et traiter ce ticket rapidement</p>
                             </div>
                         </td>
                     </tr>
 
                     <!-- Footer -->
                     <tr>
-                        <td class="email-footer">
-                            <p><strong>Integrate Health</strong> © 2025</p>
-                            <p>Equipment Manager - Suivi des réparations d'équipements ASC</p>
-                            <p>Cet email a été envoyé automatiquement. Ne pas répondre à cet email.</p>
-                            <p>Pour toute question, veuillez contacter votre administrateur système.</p>
+                        <td class="email-footer" style="background: linear-gradient(135deg, #0B588d 0%, #000000 100%); background-color: #0B588d; color: rgba(255, 255, 255, 0.8); padding: 25px 20px; text-align: center; font-size: 12px; line-height: 1.6;">
+                            <p style="margin: 5px 0; color: rgba(255, 255, 255, 0.9);"><strong style="color: #ffffff; font-weight: 700;">Integrate Health</strong> © 2025</p>
+                            <p style="margin: 5px 0; color: rgba(255, 255, 255, 0.8);">Equipment Manager - Suivi des réparations d'équipements ASC</p>
+                            <p style="margin: 5px 0; color: rgba(255, 255, 255, 0.8);">Cet email a été envoyé automatiquement. Ne pas répondre à cet email.</p>
+                            <p style="margin: 5px 0; color: rgba(255, 255, 255, 0.8);">Pour toute question, veuillez contacter votre administrateur système.</p>
                         </td>
                     </tr>
                 </table>
