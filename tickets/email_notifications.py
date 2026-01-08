@@ -96,7 +96,7 @@ def send_ticket_notification(ticket, recipient, sender, to_role, comment=''):
             'to_role': to_role,
             'to_role_display': dict(ticket.STAGE_CHOICES).get(to_role, to_role),
             'comment': comment,
-            'ticket_url': f"{settings.SITE_URL}/tickets/{ticket.pk}/" if hasattr(settings, 'SITE_URL') else f"http://localhost:8000/tickets/{ticket.pk}/",
+            'ticket_url': f"{settings.SITE_URL}/tickets/{ticket.pk}/receive/?auto_confirm=1" if hasattr(settings, 'SITE_URL') else f"http://localhost:8000/tickets/{ticket.pk}/receive/?auto_confirm=1",
         }
 
         # Préparer le sujet

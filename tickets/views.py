@@ -42,11 +42,16 @@ def ticket_detail(request, pk):
     comments = ticket.comments.all().select_related('user').order_by('created_at')
     issues = ticket.issues.all()
 
+    # Vérifier si l'utilisateur actuel est celui qui a envoyé le ticket (dernier événement SENT)
+    last_sent_event = ticket.events.filter(event_type='SENT').order_by('-timestamp').first()
+    user_sent_ticket = last_sent_event and last_sent_event.user == request.user if request.user.is_authenticated else False
+
     context = {
         'ticket': ticket,
         'events': events,
         'comments': comments,
         'issues': issues,
+        'user_sent_ticket': user_sent_ticket,
     }
     return render(request, 'tickets/detail.html', context)
 
@@ -128,6 +133,31 @@ def ticket_create(request):
 def ticket_receive(request, pk):
     """Confirmer la réception d'un ticket"""
     ticket = get_object_or_404(RepairTicket, pk=pk)
+
+    # Vérifier que l'utilisateur n'est pas celui qui a envoyé le ticket
+    last_sent_event = ticket.events.filter(event_type='SENT').order_by('-timestamp').first()
+    if last_sent_event and last_sent_event.user == request.user:
+        messages.error(request, 'Vous ne pouvez pas confirmer la réception d\'un ticket que vous avez vous-même envoyé.')
+        return redirect('tickets:detail', pk=ticket.pk)
+
+    # Confirmation automatique via paramètre GET (pour les liens dans les emails)
+    if request.method == 'GET' and request.GET.get('auto_confirm') == '1':
+        TicketEvent.objects.create(
+            ticket=ticket,
+            event_type='RECEIVED',
+            user=request.user,
+            from_role=ticket.current_stage,
+            to_role=ticket.current_stage,
+            comment='Confirmation automatique depuis l\'email',
+            timestamp=timezone.now()
+        )
+
+        ticket.current_holder = request.user
+        ticket.status = 'IN_PROGRESS'
+        ticket.save()
+
+        messages.success(request, 'Réception confirmée automatiquement!')
+        return redirect('tickets:detail', pk=ticket.pk)
 
     if request.method == 'POST':
         comment = request.POST.get('comment', '')
